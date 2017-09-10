@@ -14,8 +14,8 @@ using OpenTK.Graphics.OpenGL;
 
 
 /* TODO:
-    - have mesh import a file not only string
-    - create a mesh and display it 
+    - sort out exceptions in .obj importing
+    - fix not rendering problem
 */
 
 namespace _3D_Tree_Generator
@@ -41,10 +41,12 @@ namespace _3D_Tree_Generator
 
         Mesh mesh = new Mesh();
         float time = 0.0f;
-        const float fps = 30;
+        const float fps = 0.1f;
         Timer timer;
 
-        Matrix4 ProjectionMatrix = Matrix4.Identity;
+        Matrix4 ProjectionMatrix;
+        Matrix4 ViewMatrix;
+        Matrix4 ViewProjectionMatrix;
 
         public Window() //contructor for the window
         {
@@ -52,11 +54,13 @@ namespace _3D_Tree_Generator
         }
 
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
-        {        
+        {
 
-           
 
-            mesh = Mesh.MeshFromFile("Car.obj");
+
+            mesh = new TestCube();
+            //mesh = Mesh.MeshFromFile("Cube.obj");
+            //mesh.Position = new Vector3(0, 0, 20);
             objects.Add(mesh);
 
             //glControl1.KeyDown += new KeyEventHandler(glControl1_KeyDown);  //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
@@ -149,6 +153,12 @@ namespace _3D_Tree_Generator
             indicedata = inds.ToArray();
             coldata = colors.ToArray();
 
+            //getData();
+
+            Debug.WriteLine("Verts: " + String.Join(", ", vertdata.Select(p => p.ToString()).ToArray()));  //https://stackoverflow.com/questions/380708/shortest-method-to-convert-an-array-to-a-string-in-c-linq
+            Debug.WriteLine("inds: " + String.Join(", ", indicedata.Select(p => p.ToString()).ToArray()));
+            Debug.WriteLine("cols: " + String.Join(", ", coldata.Select(p => p.ToString()).ToArray()));
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_position); //start writing to the position VBO
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(vertdata.Length * Vector3.SizeInBytes), vertdata, BufferUsageHint.StaticDraw); //write data
             GL.VertexAttribPointer(attribute_vpos, 3, VertexAttribPointerType.Float, false, 0, 0); // tell it to use this vbo for vpositon
@@ -160,9 +170,13 @@ namespace _3D_Tree_Generator
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo_elements); //indices
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indicedata.Length * sizeof(int)), indicedata, BufferUsageHint.StaticDraw);
 
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, ClientSize.Width / (float)ClientSize.Height, 1.0f, 40.0f);
+            ViewMatrix = Matrix4.LookAt(new Vector3(0, 0, -10), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+
+            ViewProjectionMatrix = ViewMatrix * ProjectionMatrix;
             foreach (Mesh ob in objects)
             {
-                ob.CalculateModelViewProjectionMatrix(ProjectionMatrix);
+                ob.CalculateModelViewProjectionMatrix(ViewProjectionMatrix);
             } 
 
             GL.UseProgram(pgmID); //use our shader program
@@ -189,8 +203,8 @@ namespace _3D_Tree_Generator
 
             foreach (Mesh ob in objects)
             {
-                Matrix4 modviepromat = ob.ModelViewProjectionMatrix;
-                GL.UniformMatrix4(uniform_mview, false, ref modviepromat);
+                Debug.WriteLine(ob.ToString());
+                GL.UniformMatrix4(uniform_mview, false, ref ob.ModelViewProjectionMatrix);
                 GL.DrawElements(BeginMode.Triangles, ob.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint));
                 indiceat += ob.Indices.Length;
             }

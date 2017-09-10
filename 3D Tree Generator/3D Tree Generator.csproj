@@ -56,6 +56,7 @@
     <Compile Include="Face.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Object.cs" />
+    <Compile Include="TestCube.cs" />
     <Compile Include="Vertex.cs" />
     <Compile Include="Window.cs">
       <SubType>Form</SubType>
@@ -78,6 +79,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="Car.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Cube.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="OpenTK.dll.config" />

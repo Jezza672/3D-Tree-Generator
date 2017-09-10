@@ -9,6 +9,9 @@ using OpenTK.Graphics.OpenGL;
 
 namespace _3D_Tree_Generator
 {
+    /// <summary>
+    /// OUTDATED, USE MESH INSTEAD
+    /// </summary>
     class Object
     {
         private Vector3 position;

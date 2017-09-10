@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics;
 using OpenTK;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace _3D_Tree_Generator
 {
@@ -58,14 +59,7 @@ namespace _3D_Tree_Generator
         }
 
         public Matrix4 ModelMatrix { get; set; } = Matrix4.Identity;
-        private Matrix4 modelViewProjectionMatrix;
-        public Matrix4 ModelViewProjectionMatrix
-        {
-            get
-            {
-                return modelViewProjectionMatrix;
-            }
-        }
+        public Matrix4 ModelViewProjectionMatrix = Matrix4.Identity;
 
         public Vector3[] Vertices { get; set; }
         public int[] Indices { get; set; }
@@ -108,7 +102,7 @@ namespace _3D_Tree_Generator
             }
         }
 
-
+        public string Name;
 
         /// <summary>
         /// Empty Mesh. Properties not initialised.
@@ -145,8 +139,21 @@ namespace _3D_Tree_Generator
         public Mesh(Vector3[] vertices, int[] indices, Vector3[] normals) : this()
         {
             List<Face> newFaces = new List<Face>();
-            for (int i = 0; i < indices.Length; i += 3)
+            if (normals.Length < vertices.Length)
             {
+                List<Vector3> temp = new List<Vector3>(normals);
+                temp.AddRange(new Vector3[vertices.Length-normals.Length]);
+                normals = temp.ToArray();
+            }
+            for (int i = 0; i < indices.Length - 2; i += 3)
+            {
+                Debug.WriteLine("");
+                Debug.WriteLine(i.ToString());
+                Debug.WriteLine(vertices.Length.ToString());
+                Debug.WriteLine(normals.Length.ToString());
+                Debug.WriteLine(indices[i].ToString());
+                Debug.WriteLine(indices[i + 1].ToString());
+                Debug.WriteLine(indices[i + 2].ToString());
                 Face face = new Face();
                 face.Item1 = new Vertex(vertices[indices[i]], normals[indices[i]]);
                 face.Item2 = new Vertex(vertices[indices[i + 1]], normals[indices[i + 1]]);
@@ -164,33 +171,67 @@ namespace _3D_Tree_Generator
         /// <returns></returns>
         public static Mesh MeshFromString(string str)
         {
-            
+            Debug.WriteLine(str);
             List<Vector3> verts = new List<Vector3>();
             List<Vector3> norms = new List<Vector3>();
             List<Vector2> texs = new List<Vector2>();
             List<Tuple<int, int, int>> inds = new List<Tuple<int, int, int>>();
+            string name = "";
 
-            string[] lines = Regex.Split(str, "/r/n");
+            string[] lines = str.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None); //https://stackoverflow.com/questions/1547476/easiest-way-to-split-a-string-on-newlines-in-net
             foreach (string line in lines)
             {
-                string[] parts = line.Split(' ');
+                Debug.WriteLine(line);
+                List<string> parts = new List<String>(line.Split(' '));
+                if (((parts[parts.Count - 1] == " ") || (parts[parts.Count - 1] == "\r") || (parts[parts.Count - 1] == "\n") || (parts[parts.Count - 1] == "\r\n") || (parts[parts.Count - 1] == "")) && (parts.Count != 1))
+                {
+                    Debug.WriteLine("Removed: '" + parts[parts.Count - 1].ToString() + "'");
+                    parts.RemoveAt(parts.Count - 1); //https://stackoverflow.com/questions/23245569/how-to-remove-the-last-element-added-into-the-list
+                }
                 switch (parts[0])
                 {
                     case "v":
+                        Debug.WriteLine("vertex: " + parts[1].ToString() + parts[2].ToString() + parts[3].ToString());
                         verts.Add(new Vector3(float.Parse(parts[1]), float.Parse(parts[2]), float.Parse(parts[3])));
                         break;
                     case "f":
-                        for (int i = 1; i < parts.Length - 2; i++)
+                        Debug.Write("Face: ");
+                        Debug.WriteLine(String.Join(", ", parts.Select(p => p.ToString()).ToArray()));
+                        for (int i = 1; i < parts.Count - 2; i++)
                         {
                             for (int j = 0; j < 3; j++)
                             {
+                                Debug.WriteLine("Index: " + parts[i+j].ToString());
                                 string[] bits = parts[i + j].Split('/');
-                                inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]), int.Parse(bits[1]), int.Parse(bits[2])));
+                                if (bits.Length > 2)
+                                {
+                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) - 1, int.Parse(bits[2]) - 1));
+                                }
+                                else if (bits.Length == 2)
+                                {
+                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) -1, 0));
+                                }
+                                else if (bits.Length == 1)
+                                {
+                                    Debug.WriteLine(bits[0]);
+                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, 0, 0));
+                                }
                             }
                         }
                         break;
                     case "vn":
                         norms.Add(new Vector3(float.Parse(parts[1]), float.Parse(parts[2]), float.Parse(parts[3])));
+                        break;
+                    case "vt":
+                        texs.Add(new Vector2(float.Parse(parts[1]), float.Parse(parts[2])));
+                        break;
+                    case "":
+                        Debug.WriteLine("Empty line");
+                        break;
+                    case "#":
+                        break;
+                    case "g":
+                        name = parts[1];
                         break;
                     default:
                         Console.WriteLine("unrecognised character: '{0}'", parts[0]);
@@ -203,8 +244,24 @@ namespace _3D_Tree_Generator
 
             for (int i = 0; i < verts.Count; i++)
             {
-                orderedNorms[inds[i].Item1] = norms[inds[i].Item2];
-                orderedTexs[inds[i].Item1] = texs[inds[i].Item3];
+                try
+                {
+                    orderedNorms[inds[i].Item1] = norms[inds[i].Item2];
+                }
+                catch (System.ArgumentOutOfRangeException)
+                {
+                    Debug.WriteLine(String.Format("Didnt add Normal point {0}", inds[i].Item2));
+                }
+
+                try
+                {
+                    orderedTexs[inds[i].Item1] = texs[inds[i].Item3];
+                }
+                catch (System.ArgumentOutOfRangeException)
+                {
+                    Debug.WriteLine(String.Format("Didnt add Texture point {0}", inds[i].Item3));
+                }
+
             }
             int[] vertOnlyInds = new int[inds.Count];
 
@@ -214,7 +271,7 @@ namespace _3D_Tree_Generator
             }
 
             Mesh mesh = new Mesh(verts.ToArray(), vertOnlyInds, orderedNorms);
-            
+            mesh.Name = name;
             return mesh;
         }
         
@@ -265,7 +322,15 @@ namespace _3D_Tree_Generator
 
         public void CalculateModelViewProjectionMatrix(Matrix4 ViewProjectionMatrix)
         {
-            modelViewProjectionMatrix = ModelMatrix * ViewProjectionMatrix;
+            ModelViewProjectionMatrix = ModelMatrix * ViewProjectionMatrix;
+            Debug.WriteLine("Model View Projection Matrix:");
+            Debug.WriteLine(ModelViewProjectionMatrix.ToString());
+            Debug.WriteLine("");
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + ": " + Name;
         }
     }
 }
