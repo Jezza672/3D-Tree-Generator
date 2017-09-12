@@ -14,8 +14,7 @@ using OpenTK.Graphics.OpenGL;
 
 
 /* TODO:
-    - sort out exceptions in .obj importing
-    - fix not rendering problem
+ * 
 */
 
 namespace _3D_Tree_Generator
@@ -41,12 +40,14 @@ namespace _3D_Tree_Generator
 
         Mesh mesh = new Mesh();
         float time = 0.0f;
-        const float fps = 0.1f;
+        const float fps = 20f;
         Timer timer;
 
         Matrix4 ProjectionMatrix;
         Matrix4 ViewMatrix;
         Matrix4 ViewProjectionMatrix;
+
+        Random rand = new Random();
 
         public Window() //contructor for the window
         {
@@ -56,11 +57,9 @@ namespace _3D_Tree_Generator
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
-
-
-            mesh = new TestCube();
-            //mesh = Mesh.MeshFromFile("Cube.obj");
-            //mesh.Position = new Vector3(0, 0, 20);
+            //mesh = new TestCube();
+            mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
+            mesh.Position = new Vector3(0, 0, 5);
             objects.Add(mesh);
 
             //glControl1.KeyDown += new KeyEventHandler(glControl1_KeyDown);  //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
@@ -132,7 +131,6 @@ namespace _3D_Tree_Generator
         private void update()
         {
             time += timer.Interval;
-            //getData();
 
             //get data
             List<Vector3> verts = new List<Vector3>(); // create lists for adding all data from every object
@@ -141,8 +139,17 @@ namespace _3D_Tree_Generator
             int vertcount = 0;
             foreach (Mesh v in objects) // add data from each object in turn
             {
-                verts.AddRange(v.Vertices.ToList());
-                colors.AddRange(Enumerable.Repeat(new Vector3(0.5f, 0.5f, 0.5f), v.Vertices.Length).ToList());
+                verts.AddRange(v.Vertices);
+
+                colors.AddRange(v.Colors);
+
+                Vector3[] tempcols = new Vector3[v.Vertices.Length-v.Colors.Length];
+                for (int i = 0; i < tempcols.Length; i++)
+                {
+                    tempcols[i] = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
+                }
+                colors.AddRange(tempcols);
+
                 foreach (int ind in v.Indices)
                 {
                     inds.Add(ind + vertcount); // offset indices as verts go into a combined big list
@@ -152,8 +159,6 @@ namespace _3D_Tree_Generator
             vertdata = verts.ToArray(); // turn lists to arrays
             indicedata = inds.ToArray();
             coldata = colors.ToArray();
-
-            //getData();
 
             Debug.WriteLine("Verts: " + String.Join(", ", vertdata.Select(p => p.ToString()).ToArray()));  //https://stackoverflow.com/questions/380708/shortest-method-to-convert-an-array-to-a-string-in-c-linq
             Debug.WriteLine("inds: " + String.Join(", ", indicedata.Select(p => p.ToString()).ToArray()));
@@ -170,8 +175,10 @@ namespace _3D_Tree_Generator
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo_elements); //indices
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indicedata.Length * sizeof(int)), indicedata, BufferUsageHint.StaticDraw);
 
-            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, ClientSize.Width / (float)ClientSize.Height, 1.0f, 40.0f);
-            ViewMatrix = Matrix4.LookAt(new Vector3(0, 0, -10), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+            objects[0].Rotation = new Vector3(time * 0.0005f, time * 0.001f, time * 0.0015f);
+
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.0f, 40.0f);
+            ViewMatrix = Matrix4.LookAt(new Vector3(0, 0, -2), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 
             ViewProjectionMatrix = ViewMatrix * ProjectionMatrix;
             foreach (Mesh ob in objects)
@@ -231,48 +238,6 @@ namespace _3D_Tree_Generator
             Debug.WriteLine("Loading " + type.ToString() + ": " +  filename);
             Debug.WriteLine(GL.GetShaderInfoLog(address));
             Debug.WriteLine("Done");
-        }
-
-        void getData()
-        {
-            //vertdata = mesh.Vertices;
-            vertdata = new Vector3[] { new Vector3(-0.8f, -0.8f,  -0.8f),
-                new Vector3(0.8f, -0.8f,  -0.8f),
-                new Vector3(0.8f, 0.8f,  -0.8f),
-                new Vector3(-0.8f, 0.8f,  -0.8f),
-                new Vector3(-0.8f, -0.8f,  0.8f),
-                new Vector3(0.8f, -0.8f,  0.8f),
-                new Vector3(0.8f, 0.8f,  0.8f),
-                new Vector3(-0.8f, 0.8f,  0.8f),
-            };
-
-            indicedata = new int[]{
-                //front
-                0, 7, 3,
-                0, 4, 7,
-                //back
-                1, 2, 6,
-                6, 5, 1,
-                //left
-                0, 2, 1,
-                0, 3, 2,
-                //right
-                4, 5, 6,
-                6, 7, 4,
-                //top
-                2, 3, 6,
-                6, 3, 7,
-                //bottom
-                0, 1, 5,
-                0, 5, 4
-            };
-
-            coldata = new Vector3[] { new Vector3(1f, 0f, 0f),
-                new Vector3( 0f, 0f, 1f),
-                new Vector3( 0f,  1f, 0f),new Vector3(1f, 0f, 0f),
-                new Vector3( 0f, 0f, 1f),
-                new Vector3( 0f,  1f, 0f),new Vector3(1f, 0f, 0f),
-                new Vector3( 0f, 0f, 1f)};
         }
 
         //http://barcodebattler.co.uk/tutorials/csgl1.htm

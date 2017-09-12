@@ -58,12 +58,13 @@ namespace _3D_Tree_Generator
 
         }
 
-        public Matrix4 ModelMatrix { get; set; } = Matrix4.Identity;
-        public Matrix4 ModelViewProjectionMatrix = Matrix4.Identity;
+        public Matrix4 ModelMatrix { get; set; }
+        public Matrix4 ModelViewProjectionMatrix;
 
         public Vector3[] Vertices { get; set; }
         public int[] Indices { get; set; }
         public Vector3[] Normals { get; set; }
+        public Vector3[] Colors { get; set; }
 
         private Face[] faces;
         public Face[] Faces
@@ -111,8 +112,11 @@ namespace _3D_Tree_Generator
         {
             position = Vector3.Zero;
             rotation = Vector3.Zero;
-            scale = Vector3.Zero;
+            scale = Vector3.One;
             CalculateModelMatrix();
+            ModelMatrix = Matrix4.Identity;
+            ModelViewProjectionMatrix = Matrix4.Identity;
+            Colors = new Vector3[0];
         }
 
         public Mesh(Face[] newFaces) : this()

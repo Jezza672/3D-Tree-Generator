@@ -25,7 +25,8 @@ namespace _3D_Tree_Generator
             Name = "TestCube";
 
             Position = pos;
-            Vertices =  new Vector3[] {new Vector3(-0.5f, -0.5f,  -0.5f),
+            Vertices =  new Vector3[] {
+                new Vector3(-0.5f, -0.5f,  -0.5f),
                 new Vector3(0.5f, -0.5f,  -0.5f),
                 new Vector3(0.5f, 0.5f,  -0.5f),
                 new Vector3(-0.5f, 0.5f,  -0.5f),
@@ -55,6 +56,18 @@ namespace _3D_Tree_Generator
                 0, 1, 5,
                 0, 5, 4
             };
+
+            Colors = new Vector3[] {
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 0, 1),
+                new Vector3(1, 1, 0),
+                new Vector3(1, 0, 1),
+                new Vector3(0, 1, 1),
+                new Vector3(1, 1, 1)
+
+        };
 
             Debug.WriteLine(String.Format("Created Test Cube at {0}", Position.ToString()));
         }
