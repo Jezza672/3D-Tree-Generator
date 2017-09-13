@@ -59,7 +59,8 @@ namespace _3D_Tree_Generator
 
             //mesh = new TestCube();
             mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
-            mesh.Position = new Vector3(0, 0, 5);
+            mesh.Position = new Vector3(0, 0, 4);
+            mesh.Scale = new Vector3(2, 2, 2);
             objects.Add(mesh);
 
             //glControl1.KeyDown += new KeyEventHandler(glControl1_KeyDown);  //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
@@ -143,7 +144,7 @@ namespace _3D_Tree_Generator
 
                 colors.AddRange(v.Colors);
 
-                Vector3[] tempcols = new Vector3[v.Vertices.Length-v.Colors.Length];
+                Vector3[] tempcols = new Vector3[v.Vertices.Length-v.Colors.Count];
                 for (int i = 0; i < tempcols.Length; i++)
                 {
                     tempcols[i] = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());

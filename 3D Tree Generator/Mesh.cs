@@ -64,7 +64,7 @@ namespace _3D_Tree_Generator
         public Vector3[] Vertices { get; set; }
         public int[] Indices { get; set; }
         public Vector3[] Normals { get; set; }
-        public Vector3[] Colors { get; set; }
+        public List<Vector3> Colors { get; set; }
 
         private Face[] faces;
         public Face[] Faces
@@ -116,7 +116,7 @@ namespace _3D_Tree_Generator
             CalculateModelMatrix();
             ModelMatrix = Matrix4.Identity;
             ModelViewProjectionMatrix = Matrix4.Identity;
-            Colors = new Vector3[0];
+            Colors = new List<Vector3>();
         }
 
         public Mesh(Face[] newFaces) : this()
@@ -165,6 +165,14 @@ namespace _3D_Tree_Generator
                 newFaces.Add(face);
             }
             Faces = newFaces.ToArray();
+
+            Random rand = new Random();
+            Vector3[] tempcols = new Vector3[Vertices.Length - Colors.Count];
+            for (int i = 0; i < tempcols.Length; i++)
+            {
+                tempcols[i] = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
+            }
+            Colors.AddRange(tempcols);
         }
 
         
