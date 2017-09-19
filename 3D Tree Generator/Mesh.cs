@@ -66,38 +66,39 @@ namespace _3D_Tree_Generator
         public Vector3[] Normals { get; set; }
         public List<Vector3> Colors { get; set; }
 
-        private Face[] faces;
-        public Face[] Faces
+        private Tri[] tris;
+        public Tri[] Tris
         {
             get
             {
-                return faces;
+                return tris;
             }
             set
             {
-                faces = value;
-                Vector3[] normals = new Vector3[faces.Length * 3];
-                for (int i = 0; i < faces.Length; i++)
+                tris = value;
+                Vector3[] normals = new Vector3[tris.Length * 3];
+                for (int i = 0; i < tris.Length; i++)
                 {
-                    normals[i * 3] = faces[i].Item1.Normal;
-                    normals[i * 3 + 1] = faces[i].Item2.Normal;
-                    normals[i * 3 + 2] = faces[i].Item3.Normal;
+                    Debug.WriteLine(tris[i].Item1);
+                    normals[i * 3] = tris[i].Item1.Normal;
+                    normals[i * 3 + 1] = tris[i].Item2.Normal;
+                    normals[i * 3 + 2] = tris[i].Item3.Normal;
                 }
 
                 Normals = normals;
-                int[] indices = new int[faces.Length * 3];
-                for (int i = 0; i < faces.Length * 3; i++)
+                int[] indices = new int[tris.Length * 3];
+                for (int i = 0; i < tris.Length * 3; i++)
                 {
                     indices[i] = i;
                 }
                 Indices = indices;
 
-                Vector3[] vertices = new Vector3[faces.Length * 3];
-                for (int i = 0; i < faces.Length; i++)
+                Vector3[] vertices = new Vector3[tris.Length * 3];
+                for (int i = 0; i < tris.Length; i++)
                 {
-                    vertices[i * 3] = faces[i].Item1.Position;
-                    vertices[i * 3 + 1] = faces[i].Item2.Position;
-                    vertices[i * 3 + 2] = faces[i].Item3.Position;
+                    vertices[i * 3] = tris[i].Item1.Position;
+                    vertices[i * 3 + 1] = tris[i].Item2.Position;
+                    vertices[i * 3 + 2] = tris[i].Item3.Position;
                 }
                 Vertices = vertices;
             }
@@ -119,9 +120,9 @@ namespace _3D_Tree_Generator
             Colors = new List<Vector3>();
         }
 
-        public Mesh(Face[] newFaces) : this()
+        public Mesh(Tri[] newFaces) : this()
         {
-            Faces = newFaces;
+            Tris = newFaces;
         }
 
         /// <summary>
@@ -142,7 +143,7 @@ namespace _3D_Tree_Generator
         /// <param name="normals"></param>
         public Mesh(Vector3[] vertices, int[] indices, Vector3[] normals) : this()
         {
-            List<Face> newFaces = new List<Face>();
+            List<Tri> newFaces = new List<Tri>();
             if (normals.Length < vertices.Length)
             {
                 List<Vector3> temp = new List<Vector3>(normals);
@@ -158,13 +159,13 @@ namespace _3D_Tree_Generator
                 Debug.WriteLine(indices[i].ToString());
                 Debug.WriteLine(indices[i + 1].ToString());
                 Debug.WriteLine(indices[i + 2].ToString());
-                Face face = new Face();
+                Tri face = new Tri();
                 face.Item1 = new Vertex(vertices[indices[i]], normals[indices[i]]);
                 face.Item2 = new Vertex(vertices[indices[i + 1]], normals[indices[i + 1]]);
                 face.Item3 = new Vertex(vertices[indices[i + 2]], normals[indices[i + 2]]);
                 newFaces.Add(face);
             }
-            Faces = newFaces.ToArray();
+            Tris = newFaces.ToArray();
 
             Random rand = new Random();
             Vector3[] tempcols = new Vector3[Vertices.Length - Colors.Count];
@@ -207,7 +208,7 @@ namespace _3D_Tree_Generator
                         verts.Add(new Vector3(float.Parse(parts[1]), float.Parse(parts[2]), float.Parse(parts[3])));
                         break;
                     case "f":
-                        Debug.Write("Face: ");
+                        Debug.Write("Tri: ");
                         Debug.WriteLine(String.Join(", ", parts.Select(p => p.ToString()).ToArray()));
                         for (int i = 1; i < parts.Count - 2; i++)
                         {
@@ -246,7 +247,7 @@ namespace _3D_Tree_Generator
                         name = parts[1];
                         break;
                     default:
-                        Console.WriteLine("unrecognised character: '{0}'", parts[0]);
+                        Debug.WriteLine("unrecognised character: '{0}'", parts[0]);
                         break;
                 }
             }
@@ -256,22 +257,13 @@ namespace _3D_Tree_Generator
 
             for (int i = 0; i < verts.Count; i++)
             {
-                try
+                if (inds[i].Item1 < norms.Count)
                 {
                     orderedNorms[inds[i].Item1] = norms[inds[i].Item2];
                 }
-                catch (System.ArgumentOutOfRangeException)
-                {
-                    Debug.WriteLine(String.Format("Didnt add Normal point {0}", inds[i].Item2));
-                }
-
-                try
+                if (inds[i].Item1 < texs.Count)
                 {
                     orderedTexs[inds[i].Item1] = texs[inds[i].Item3];
-                }
-                catch (System.ArgumentOutOfRangeException)
-                {
-                    Debug.WriteLine(String.Format("Didnt add Texture point {0}", inds[i].Item3));
                 }
 
             }

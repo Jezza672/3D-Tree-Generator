@@ -14,7 +14,8 @@ using OpenTK.Graphics.OpenGL;
 
 
 /* TODO:
- * 
+ * make crateBranch use an array and be nicer
+ * create branch doesn't create all the tris it should!
 */
 
 namespace _3D_Tree_Generator
@@ -36,15 +37,16 @@ namespace _3D_Tree_Generator
         Vector3[] vertdata; // array of vertices to send to buffers
         int[] indicedata;
         Vector3[] coldata; // " colors
+
         List<Mesh> objects = new List<Mesh>();
 
-        Mesh mesh = new Mesh();
+        Camera camera = new Camera();
+
         float time = 0.0f;
         const float fps = 20f;
         Timer timer;
 
         Matrix4 ProjectionMatrix;
-        Matrix4 ViewMatrix;
         Matrix4 ViewProjectionMatrix;
 
         Random rand = new Random();
@@ -57,11 +59,14 @@ namespace _3D_Tree_Generator
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
+            Mesh mesh = new Mesh();
             //mesh = new TestCube();
             mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
-            mesh.Position = new Vector3(0, 0, 4);
-            mesh.Scale = new Vector3(2, 2, 2);
-            objects.Add(mesh);
+            Tree tree = new Tree();
+            tree.GenerateTree();
+            objects.Add(tree.Mesh);
+
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.0f, 40.0f);
 
             //glControl1.KeyDown += new KeyEventHandler(glControl1_KeyDown);  //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
             //glControl1.KeyUp += new KeyEventHandler(glControl1_KeyUp);
@@ -178,10 +183,8 @@ namespace _3D_Tree_Generator
 
             objects[0].Rotation = new Vector3(time * 0.0005f, time * 0.001f, time * 0.0015f);
 
-            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.0f, 40.0f);
-            ViewMatrix = Matrix4.LookAt(new Vector3(0, 0, -2), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+            ViewProjectionMatrix = camera.ViewMatrix * ProjectionMatrix;
 
-            ViewProjectionMatrix = ViewMatrix * ProjectionMatrix;
             foreach (Mesh ob in objects)
             {
                 ob.CalculateModelViewProjectionMatrix(ViewProjectionMatrix);

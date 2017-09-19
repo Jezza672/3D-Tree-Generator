@@ -16,28 +16,34 @@ namespace _3D_Tree_Generator
         public Vector3 Position;
         public Vector3 Normal;
         public Vector2 TextureCoord;
-
+        public Vector3 Color;
 
         /// <summary>
-        /// Empty Vertex. Properties not initialised
+        /// Empty Vertex.
         /// </summary>
         public Vertex()
         {
+            Position = new Vector3(0, 0, 0);
+            Normal = new Vector3(0, 0, 0);
+            TextureCoord = new Vector2(0, 0);
+            Color = new Vector3(0, 0, 0);
         }
 
         /// <summary>
-        /// Vertex with position. Otheres not initialised
+        /// Vertex with position.
         /// </summary>
         /// <param name="pos"></param>
         public Vertex(Vector3 position)
         {
             Position = position;
-
+            Normal = new Vector3(0, 0, 0);
+            TextureCoord = new Vector2(0, 0);
+            Color = new Vector3(0, 0, 0);
         }
 
 
         /// <summary>
-        /// Vertex with position and normal. Texture Coordinate not initialised
+        /// Vertex with position and normal.
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="norm"></param>
@@ -45,11 +51,13 @@ namespace _3D_Tree_Generator
         {
             Position = position;
             Normal = normal;
+            TextureCoord = new Vector2(0, 0);
+            Color = new Vector3(0, 0, 0);
         }
 
 
         /// <summary>
-        /// Vertex with position, normal and texture coordinate
+        /// Vertex with position, normal and texture coordinate.
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="norm"></param>
@@ -59,6 +67,21 @@ namespace _3D_Tree_Generator
             Position = position;
             Normal = normal;
             TextureCoord = texturecoordinate;
+            Color = new Vector3(0, 0, 0);
+        }
+
+        /// <summary>
+        /// Vertex with poisition, normal and color.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="normal"></param>
+        /// <param name="color"></param>
+        public Vertex(Vector3 position, Vector3 normal, Vector3 color)
+        {
+            Position = position;
+            Normal = normal;
+            TextureCoord = new Vector2(0, 0);
+            Color = color;
         }
     }
 }

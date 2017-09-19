@@ -11,23 +11,27 @@ using System.Drawing;
 
 namespace _3D_Tree_Generator
 {
-    class Face : IEnumerable<Vertex>
+    class Tri : IEnumerable<Vertex>
     {
         public Vertex Item1;
         public Vertex Item2;
         public Vertex Item3;
 
-        public Face()
+        public Tri()
         {
-
+            Item1 = new Vertex();
+            Item2 = new Vertex();
+            Item3 = new Vertex();
         }
-        public Face(Vertex vertexOne, Vertex vertexTwo, Vertex vertexThree)
+
+        public Tri(Vertex vertexOne, Vertex vertexTwo, Vertex vertexThree)
         {
             Item1 = vertexOne;
             Item2 = vertexTwo;
             Item3 = vertexThree;
         }
-        public Face(Tuple<Vertex, Vertex, Vertex> tuple)
+
+        public Tri(Tuple<Vertex, Vertex, Vertex> tuple)
         {
             Item1 = tuple.Item1;
             Item2 = tuple.Item2;
@@ -44,6 +48,11 @@ namespace _3D_Tree_Generator
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return "Tri: " + Item1.Position.ToString() +  ", " + Item2.Position.ToString() + ", " + Item3.Position.ToString();
         }
     }
 }

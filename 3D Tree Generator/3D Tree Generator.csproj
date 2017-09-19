@@ -54,10 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Face.cs" />
+    <Compile Include="Camera.cs" />
+    <Compile Include="Tri.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="TestCube.cs" />
+    <Compile Include="Tree.cs" />
     <Compile Include="Vertex.cs" />
     <Compile Include="Window.cs">
       <SubType>Form</SubType>
