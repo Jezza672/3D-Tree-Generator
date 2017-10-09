@@ -14,8 +14,9 @@ using OpenTK.Graphics.OpenGL;
 
 
 /* TODO:
- * make crateBranch use an array and be nicer
- * create branch doesn't create all the tris it should!
+ * Fix Color rendering
+ * add normal support
+ * GenerateBranch
 */
 
 namespace _3D_Tree_Generator
@@ -59,11 +60,11 @@ namespace _3D_Tree_Generator
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
-            Mesh mesh = new Mesh();
+            //Mesh mesh = new Mesh();
             //mesh = new TestCube();
-            mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
+            //mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
             Tree tree = new Tree();
-            tree.GenerateTree();
+            tree.GenerateTree(2f);
             objects.Add(tree.Mesh);
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.0f, 40.0f);
@@ -152,7 +153,8 @@ namespace _3D_Tree_Generator
                 Vector3[] tempcols = new Vector3[v.Vertices.Length-v.Colors.Count];
                 for (int i = 0; i < tempcols.Length; i++)
                 {
-                    tempcols[i] = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
+                    //tempcols[i] = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
+                    tempcols[i] = new Vector3((0f+(float)i) / 255f, 69f / 255f, 19f / 255f);
                 }
                 colors.AddRange(tempcols);
 
@@ -181,7 +183,7 @@ namespace _3D_Tree_Generator
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo_elements); //indices
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indicedata.Length * sizeof(int)), indicedata, BufferUsageHint.StaticDraw);
 
-            objects[0].Rotation = new Vector3(time * 0.0005f, time * 0.001f, time * 0.0015f);
+            //objects[0].Rotation = new Vector3(time * 0.0005f, time * 0.001f, time * 0.0015f);
 
             ViewProjectionMatrix = camera.ViewMatrix * ProjectionMatrix;
 

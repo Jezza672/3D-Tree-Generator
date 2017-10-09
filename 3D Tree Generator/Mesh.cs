@@ -84,8 +84,8 @@ namespace _3D_Tree_Generator
                     normals[i * 3 + 1] = tris[i].Item2.Normal;
                     normals[i * 3 + 2] = tris[i].Item3.Normal;
                 }
-
                 Normals = normals;
+
                 int[] indices = new int[tris.Length * 3];
                 for (int i = 0; i < tris.Length * 3; i++)
                 {
@@ -99,6 +99,15 @@ namespace _3D_Tree_Generator
                     vertices[i * 3] = tris[i].Item1.Position;
                     vertices[i * 3 + 1] = tris[i].Item2.Position;
                     vertices[i * 3 + 2] = tris[i].Item3.Position;
+                }
+                Vertices = vertices;
+
+                Vector3[] colors = new Vector3[tris.Length * 3];
+                for (int i = 0; i < tris.Length; i++)
+                {
+                    colors[i * 3] = tris[i].Item1.Color;
+                    colors[i * 3 + 1] = tris[i].Item2.Color;
+                    colors[i * 3 + 2] = tris[i].Item3.Color;
                 }
                 Vertices = vertices;
             }
@@ -118,6 +127,7 @@ namespace _3D_Tree_Generator
             ModelMatrix = Matrix4.Identity;
             ModelViewProjectionMatrix = Matrix4.Identity;
             Colors = new List<Vector3>();
+            tris = new Tri[] { new Tri()};
         }
 
         public Mesh(Tri[] newFaces) : this()
@@ -335,6 +345,11 @@ namespace _3D_Tree_Generator
         public override string ToString()
         {
             return base.ToString() + ": " + Name;
+        }
+
+        public static Mesh operator +(Mesh left, Mesh right)
+        {
+            return new Mesh(left.Tris.Concat(right.Tris).ToArray());   //https://stackoverflow.com/questions/59217/merging-two-arrays-in-net
         }
     }
 }

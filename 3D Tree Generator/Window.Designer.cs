@@ -41,8 +41,6 @@ namespace _3D_Tree_Generator
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.treeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.environmentToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,15 +52,24 @@ namespace _3D_Tree_Generator
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fieldOfViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.frameRateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.leafToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.screenshotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.environmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.guideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
+            this.environmentToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -139,68 +146,54 @@ namespace _3D_Tree_Generator
             // 
             // newToolStripMenuItem
             // 
-            this.newToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.treeToolStripMenuItem,
-            this.environmentToolStripMenuItem1});
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.newToolStripMenuItem.Text = "New";
-            // 
-            // treeToolStripMenuItem
-            // 
-            this.treeToolStripMenuItem.Name = "treeToolStripMenuItem";
-            this.treeToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.treeToolStripMenuItem.Text = "Tree";
-            // 
-            // environmentToolStripMenuItem1
-            // 
-            this.environmentToolStripMenuItem1.Name = "environmentToolStripMenuItem1";
-            this.environmentToolStripMenuItem1.Size = new System.Drawing.Size(142, 22);
-            this.environmentToolStripMenuItem1.Text = "Environment";
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.openToolStripMenuItem.Text = "Open";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
             // 
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.currentTreeToolStripMenuItem,
-            this.forrestToolStripMenuItem});
+            this.forrestToolStripMenuItem,
+            this.environmentToolStripMenuItem1});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // currentTreeToolStripMenuItem
             // 
             this.currentTreeToolStripMenuItem.Name = "currentTreeToolStripMenuItem";
-            this.currentTreeToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.currentTreeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.currentTreeToolStripMenuItem.Text = "Current Tree";
             // 
             // forrestToolStripMenuItem
             // 
             this.forrestToolStripMenuItem.Name = "forrestToolStripMenuItem";
-            this.forrestToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.forrestToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.forrestToolStripMenuItem.Text = "Forrest";
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.closeToolStripMenuItem.Text = "Close";
             // 
             // editToolStripMenuItem
@@ -215,42 +208,102 @@ namespace _3D_Tree_Generator
             // undoToolStripMenuItem
             // 
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.undoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.undoToolStripMenuItem.Text = "Undo";
             // 
             // redoToolStripMenuItem
             // 
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.redoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.redoToolStripMenuItem.Text = "Redo";
             // 
             // viewToolStripMenuItem
             // 
+            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fieldOfViewToolStripMenuItem,
+            this.frameRateToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "View";
             // 
+            // fieldOfViewToolStripMenuItem
+            // 
+            this.fieldOfViewToolStripMenuItem.Name = "fieldOfViewToolStripMenuItem";
+            this.fieldOfViewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.fieldOfViewToolStripMenuItem.Text = "Field Of View";
+            // 
+            // frameRateToolStripMenuItem
+            // 
+            this.frameRateToolStripMenuItem.Name = "frameRateToolStripMenuItem";
+            this.frameRateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.frameRateToolStripMenuItem.Text = "Frame Rate";
+            // 
             // leafToolStripMenuItem
             // 
+            this.leafToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.createNewToolStripMenuItem,
+            this.loadToolStripMenuItem,
+            this.screenshotToolStripMenuItem});
             this.leafToolStripMenuItem.Name = "leafToolStripMenuItem";
             this.leafToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
             this.leafToolStripMenuItem.Text = "Leaf";
             // 
+            // createNewToolStripMenuItem
+            // 
+            this.createNewToolStripMenuItem.Name = "createNewToolStripMenuItem";
+            this.createNewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.createNewToolStripMenuItem.Text = "Create New";
+            // 
+            // loadToolStripMenuItem
+            // 
+            this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadToolStripMenuItem.Text = "Load From File";
+            // 
+            // screenshotToolStripMenuItem
+            // 
+            this.screenshotToolStripMenuItem.Name = "screenshotToolStripMenuItem";
+            this.screenshotToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.screenshotToolStripMenuItem.Text = "Screenshot";
+            // 
             // environmentToolStripMenuItem
             // 
+            this.environmentToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.createNewToolStripMenuItem1,
+            this.loadToolStripMenuItem1});
             this.environmentToolStripMenuItem.Name = "environmentToolStripMenuItem";
             this.environmentToolStripMenuItem.Size = new System.Drawing.Size(87, 20);
             this.environmentToolStripMenuItem.Text = "Environment";
             // 
+            // createNewToolStripMenuItem1
+            // 
+            this.createNewToolStripMenuItem1.Name = "createNewToolStripMenuItem1";
+            this.createNewToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.createNewToolStripMenuItem1.Text = "Create New";
+            // 
+            // loadToolStripMenuItem1
+            // 
+            this.loadToolStripMenuItem1.Name = "loadToolStripMenuItem1";
+            this.loadToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.loadToolStripMenuItem1.Text = "Load";
+            // 
             // helpToolStripMenuItem
             // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.guideToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
+            // guideToolStripMenuItem
+            // 
+            this.guideToolStripMenuItem.Name = "guideToolStripMenuItem";
+            this.guideToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.guideToolStripMenuItem.Text = "Guide";
+            // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(967, 65);
+            this.numericUpDown1.Location = new System.Drawing.Point(955, 98);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(43, 20);
             this.numericUpDown1.TabIndex = 2;
@@ -258,7 +311,7 @@ namespace _3D_Tree_Generator
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(926, 67);
+            this.label1.Location = new System.Drawing.Point(914, 100);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(34, 13);
             this.label1.TabIndex = 3;
@@ -267,7 +320,7 @@ namespace _3D_Tree_Generator
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(905, 96);
+            this.label2.Location = new System.Drawing.Point(893, 129);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(55, 13);
             this.label2.TabIndex = 5;
@@ -275,7 +328,7 @@ namespace _3D_Tree_Generator
             // 
             // numericUpDown2
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(967, 94);
+            this.numericUpDown2.Location = new System.Drawing.Point(955, 127);
             this.numericUpDown2.Name = "numericUpDown2";
             this.numericUpDown2.Size = new System.Drawing.Size(43, 20);
             this.numericUpDown2.TabIndex = 4;
@@ -283,7 +336,7 @@ namespace _3D_Tree_Generator
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(922, 126);
+            this.label3.Location = new System.Drawing.Point(910, 159);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(38, 13);
             this.label3.TabIndex = 7;
@@ -291,10 +344,16 @@ namespace _3D_Tree_Generator
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(967, 124);
+            this.numericUpDown3.Location = new System.Drawing.Point(955, 157);
             this.numericUpDown3.Name = "numericUpDown3";
             this.numericUpDown3.Size = new System.Drawing.Size(43, 20);
             this.numericUpDown3.TabIndex = 6;
+            // 
+            // environmentToolStripMenuItem1
+            // 
+            this.environmentToolStripMenuItem1.Name = "environmentToolStripMenuItem1";
+            this.environmentToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.environmentToolStripMenuItem1.Text = "Environment";
             // 
             // Window
             // 
@@ -330,8 +389,6 @@ namespace _3D_Tree_Generator
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem treeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem environmentToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
@@ -356,6 +413,15 @@ namespace _3D_Tree_Generator
         private ToolStripMenuItem refreshToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem backgroundToolStripMenuItem;
+        private ToolStripMenuItem fieldOfViewToolStripMenuItem;
+        private ToolStripMenuItem frameRateToolStripMenuItem;
+        private ToolStripMenuItem createNewToolStripMenuItem;
+        private ToolStripMenuItem loadToolStripMenuItem;
+        private ToolStripMenuItem screenshotToolStripMenuItem;
+        private ToolStripMenuItem createNewToolStripMenuItem1;
+        private ToolStripMenuItem loadToolStripMenuItem1;
+        private ToolStripMenuItem guideToolStripMenuItem;
+        private ToolStripMenuItem environmentToolStripMenuItem1;
     }
 }
 
