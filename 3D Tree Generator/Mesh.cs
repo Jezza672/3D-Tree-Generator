@@ -79,7 +79,7 @@ namespace _3D_Tree_Generator
                 Vector3[] normals = new Vector3[tris.Length * 3];
                 for (int i = 0; i < tris.Length; i++)
                 {
-                    Debug.WriteLine(tris[i].Item1);
+                    //Debug.WriteLine(tris[i].Item1);
                     normals[i * 3] = tris[i].Item1.Normal;
                     normals[i * 3 + 1] = tris[i].Item2.Normal;
                     normals[i * 3 + 2] = tris[i].Item3.Normal;
@@ -162,13 +162,13 @@ namespace _3D_Tree_Generator
             }
             for (int i = 0; i < indices.Length - 2; i += 3)
             {
-                Debug.WriteLine("");
-                Debug.WriteLine(i.ToString());
-                Debug.WriteLine(vertices.Length.ToString());
-                Debug.WriteLine(normals.Length.ToString());
-                Debug.WriteLine(indices[i].ToString());
-                Debug.WriteLine(indices[i + 1].ToString());
-                Debug.WriteLine(indices[i + 2].ToString());
+                //Debug.WriteLine("");
+                //Debug.WriteLine(i.ToString());
+                //Debug.WriteLine(vertices.Length.ToString());
+                //Debug.WriteLine(normals.Length.ToString());
+                //Debug.WriteLine(indices[i].ToString());
+                //Debug.WriteLine(indices[i + 1].ToString());
+                //Debug.WriteLine(indices[i + 2].ToString());
                 Tri face = new Tri();
                 face.Item1 = new Vertex(vertices[indices[i]], normals[indices[i]]);
                 face.Item2 = new Vertex(vertices[indices[i + 1]], normals[indices[i + 1]]);
@@ -331,15 +331,52 @@ namespace _3D_Tree_Generator
 
         private void CalculateModelMatrix()
         {
-            ModelMatrix = Matrix4.CreateScale(scale) * Matrix4.CreateRotationX(rotation.X) * Matrix4.CreateRotationY(rotation.Y) * Matrix4.CreateRotationZ(rotation.Z) * Matrix4.CreateTranslation(position);
+            ModelMatrix = Matrix4.CreateTranslation(position) * Matrix4.CreateRotationX(rotation.X) * Matrix4.CreateRotationY(rotation.Y) * Matrix4.CreateRotationZ(rotation.Z) * Matrix4.CreateScale(scale);
         }
 
         public void CalculateModelViewProjectionMatrix(Matrix4 ViewProjectionMatrix)
         {
             ModelViewProjectionMatrix = ModelMatrix * ViewProjectionMatrix;
-            Debug.WriteLine("Model View Projection Matrix:");
-            Debug.WriteLine(ModelViewProjectionMatrix.ToString());
-            Debug.WriteLine("");
+            //Debug.WriteLine("Model View Projection Matrix:");
+            //Debug.WriteLine(ModelViewProjectionMatrix.ToString());
+            //Debug.WriteLine("");
+        }
+
+        public Mesh AddTris(Tri[] tris)
+        {
+            List<Tri> temp = Tris.ToList();
+            temp.AddRange(tris);
+            Tris = temp.ToArray();
+            return this;
+        }
+
+        public Mesh Transform(Vector3 Positon, Vector3 Rotation, Vector3 Scale)
+        {
+            Matrix4 mat = Matrix4.CreateTranslation(position) * Matrix4.CreateRotationX(rotation.X) * Matrix4.CreateRotationY(rotation.Y) * Matrix4.CreateRotationZ(rotation.Z) * Matrix4.CreateScale(scale);
+            return Transform(mat);
+        }
+
+        public Mesh Transform(Matrix4 mat)
+        {
+            Debug.WriteLine(mat);
+            Vector3 translation = mat.ExtractTranslation();
+            //Debug.WriteLine(translation);
+            //Debug.WriteLine(new Vector3(mat * new Vector4(new Vector3(0f,1.0f,0f), 1.0f)) + translation);
+            mat = mat.ClearTranslation();
+            //Debug.WriteLine(mat);
+
+            Tri[] newtris = new Tri[Tris.Length];
+            
+            for (int i = 0; i < Tris.Length; i++)
+            {
+                newtris[i] = new Tri();
+                newtris[i].Item1 = Tris[i].Item1.Transformed(mat, translation);
+                newtris[i].Item2 = Tris[i].Item2.Transformed(mat, translation);
+                newtris[i].Item3 = Tris[i].Item3.Transformed(mat, translation);
+            }
+
+            Mesh Mesh = new Mesh(newtris);
+            return Mesh;
         }
 
         public override string ToString()

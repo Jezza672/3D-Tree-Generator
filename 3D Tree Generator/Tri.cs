@@ -52,7 +52,7 @@ namespace _3D_Tree_Generator
 
         public override string ToString()
         {
-            return "Tri: " + Item1.Position.ToString() +  ", " + Item2.Position.ToString() + ", " + Item3.Position.ToString();
+            return "Tri: " + Item1 +  ", " + Item2 + ", " + Item3;
         }
     }
 }

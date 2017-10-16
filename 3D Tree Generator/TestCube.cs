@@ -20,12 +20,7 @@ namespace _3D_Tree_Generator
         {
 
         }
-        public TestCube(Vector3 pos) : base()
-        {
-            Name = "TestCube";
-
-            Position = pos;
-            Vertices =  new Vector3[] {
+        public TestCube(Vector3 pos) : base(new Vector3[] {
                 new Vector3(-0.5f, -0.5f,  -0.5f),
                 new Vector3(0.5f, -0.5f,  -0.5f),
                 new Vector3(0.5f, 0.5f,  -0.5f),
@@ -34,9 +29,7 @@ namespace _3D_Tree_Generator
                 new Vector3(0.5f, -0.5f,  0.5f),
                 new Vector3(0.5f, 0.5f,  0.5f),
                 new Vector3(-0.5f, 0.5f,  0.5f),
-            };
-
-            Indices = new int[] {
+            }, new int[] {
                 //left
                 0, 2, 1,
                 0, 3, 2,
@@ -55,7 +48,12 @@ namespace _3D_Tree_Generator
                 //bottom
                 0, 1, 5,
                 0, 5, 4
-            };
+            }
+        )
+        {
+            Name = "TestCube";
+
+            Position = pos;
 
             Colors = new Vector3[] {
                 new Vector3(0, 0, 0),
@@ -65,9 +63,36 @@ namespace _3D_Tree_Generator
                 new Vector3(1, 1, 0),
                 new Vector3(1, 0, 1),
                 new Vector3(0, 1, 1),
-                new Vector3(1, 1, 1)
-
-        }.ToList();
+                new Vector3(1, 1, 1),
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 0, 1),
+                new Vector3(1, 1, 0),
+                new Vector3(1, 0, 1),
+                new Vector3(0, 1, 1),
+                new Vector3(1, 1, 1),
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 0, 1),
+                new Vector3(1, 1, 0),
+                new Vector3(1, 0, 1),
+                new Vector3(0, 1, 1),
+                new Vector3(1, 1, 1),
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 0, 1),
+                new Vector3(1, 1, 0),
+                new Vector3(1, 0, 1),
+                new Vector3(0, 1, 1),
+                new Vector3(1, 1, 1),
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 0, 1)
+            }.ToList();
 
             Debug.WriteLine(String.Format("Created Test Cube at {0}", Position.ToString()));
         }

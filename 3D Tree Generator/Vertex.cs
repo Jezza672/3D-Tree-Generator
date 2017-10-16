@@ -83,5 +83,55 @@ namespace _3D_Tree_Generator
             TextureCoord = new Vector2(0, 0);
             Color = color;
         }
+
+        /// <summary>
+        /// Transform vertex position by a matrix
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public Vertex Transform(Matrix4 mat)
+        {
+            Vector3 translation = mat.ExtractTranslation();
+            mat = mat.ClearTranslation();
+            return Transform(mat, translation);
+        }
+
+        /// <summary>
+        /// Transform vertex position by a matrix
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <param name="translation"></param>
+        /// <returns></returns>
+        public Vertex Transform(Matrix4 mat, Vector3 translation)
+        {
+            Position = new Vector3(mat * new Vector4(Position, 1)) + translation;
+            return this;
+        }
+
+        /// <summary>
+        /// Returns a translated, alernate version of the vertex
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <param name="translation"></param>
+        /// <returns></returns>
+        public Vertex Transformed(Matrix4 mat, Vector3 translation)
+        {
+            return new Vertex(Position, Normal, TextureCoord).Transform(mat, translation);
+        }
+
+        /// <summary>
+        /// Returns a translated, alernate version of the vertex
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public Vertex Transformed(Matrix4 mat)
+        {
+            return new Vertex(Position, Normal, TextureCoord).Transform(mat);
+        }
+
+        public override string ToString()
+        {
+            return Position.ToString();
+        }
     }
 }

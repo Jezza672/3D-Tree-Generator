@@ -49,7 +49,7 @@ namespace _3D_Tree_Generator
 
         Matrix4 ProjectionMatrix;
         Matrix4 ViewProjectionMatrix;
-
+        Matrix4 mat = Matrix4.CreateTranslation(new Vector3(0, 2, 0));
         Random rand = new Random();
 
         public Window() //contructor for the window
@@ -61,11 +61,14 @@ namespace _3D_Tree_Generator
         {
 
             //Mesh mesh = new Mesh();
-            //mesh = new TestCube();
+            Mesh mesh = new TestCube();
             //mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
-            Tree tree = new Tree();
-            tree.GenerateTree(2f);
-            objects.Add(tree.Mesh);
+            Tree tree = new Tree(10f, 1f, Matrix4.CreateTranslation(new Vector3(0, -5, 0)));
+            tree.GenerateTree();
+            //mat = mat * Matrix4.CreateRotationX(2);
+            //mesh = mesh.Transform(mat);
+            tree.Position = new Vector3(0, -5f, 0);
+            objects.Add(tree);
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.0f, 40.0f);
 
@@ -168,9 +171,9 @@ namespace _3D_Tree_Generator
             indicedata = inds.ToArray();
             coldata = colors.ToArray();
 
-            Debug.WriteLine("Verts: " + String.Join(", ", vertdata.Select(p => p.ToString()).ToArray()));  //https://stackoverflow.com/questions/380708/shortest-method-to-convert-an-array-to-a-string-in-c-linq
-            Debug.WriteLine("inds: " + String.Join(", ", indicedata.Select(p => p.ToString()).ToArray()));
-            Debug.WriteLine("cols: " + String.Join(", ", coldata.Select(p => p.ToString()).ToArray()));
+            //Debug.WriteLine("Verts: " + String.Join(", ", vertdata.Select(p => p.ToString()).ToArray()));  //https://stackoverflow.com/questions/380708/shortest-method-to-convert-an-array-to-a-string-in-c-linq
+            //Debug.WriteLine("inds: " + String.Join(", ", indicedata.Select(p => p.ToString()).ToArray()));
+            //Debug.WriteLine("cols: " + String.Join(", ", coldata.Select(p => p.ToString()).ToArray()));
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_position); //start writing to the position VBO
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(vertdata.Length * Vector3.SizeInBytes), vertdata, BufferUsageHint.StaticDraw); //write data
@@ -183,7 +186,8 @@ namespace _3D_Tree_Generator
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo_elements); //indices
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indicedata.Length * sizeof(int)), indicedata, BufferUsageHint.StaticDraw);
 
-            //objects[0].Rotation = new Vector3(time * 0.0005f, time * 0.001f, time * 0.0015f);
+            //objects[0].Rotation = new Vector3(0, time * 0.001f,0);
+            //objects[0] = objects[0].Transform(mat * Matrix4.CreateRotationX(0.01f) * mat.Inverted());
 
             ViewProjectionMatrix = camera.ViewMatrix * ProjectionMatrix;
 
@@ -196,7 +200,7 @@ namespace _3D_Tree_Generator
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // unbind the buffers (bind null buffer)
 
-            Debug.WriteLine("Update");
+            //Debug.WriteLine("Update");
         }
 
 
@@ -216,7 +220,7 @@ namespace _3D_Tree_Generator
 
             foreach (Mesh ob in objects)
             {
-                Debug.WriteLine(ob.ToString());
+                //Debug.WriteLine(ob.ToString());
                 GL.UniformMatrix4(uniform_mview, false, ref ob.ModelViewProjectionMatrix);
                 GL.DrawElements(BeginMode.Triangles, ob.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint));
                 indiceat += ob.Indices.Length;
@@ -229,7 +233,7 @@ namespace _3D_Tree_Generator
 
             GL.Flush();
             glControl1.SwapBuffers();
-            Debug.WriteLine("Paint");
+            //Debug.WriteLine("Paint");
         }
 
         void loadShader(String filename, ShaderType type, int program, out int address)

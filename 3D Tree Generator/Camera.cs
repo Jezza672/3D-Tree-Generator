@@ -35,7 +35,7 @@ namespace _3D_Tree_Generator
 
         public Camera()
         {
-            Position = new Vector3(0, 0, -4);
+            Position = new Vector3(0, 0, 10);
             LookingAt = new Vector3(0, 0, 0);
             Up = new Vector3(0, 1, 0);
         }
