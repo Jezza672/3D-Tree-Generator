@@ -32,7 +32,7 @@ namespace _3D_Tree_Generator
             Noise = 0;
             Branching = 1;
             Seed = 100;
-            Quality = 36;
+            Quality = 3;
             MinHeight = 0.1f;
             MinRadius = 0.1f;
             Alpha = 0.1f;
@@ -85,7 +85,7 @@ namespace _3D_Tree_Generator
 
             Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight);
                   
-            Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(0.02f);
+            Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(0.05f);
             
             verts.AddRange(result.Item1.Select(i => i.Transformed(matrix)));
 

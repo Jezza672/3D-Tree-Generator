@@ -55,10 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Test Classes\TestAxes.cs" />
     <Compile Include="Tri.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Object.cs" />
-    <Compile Include="TestCube.cs" />
+    <Compile Include="Test Classes\TestCube.cs" />
     <Compile Include="Tree.cs" />
     <Compile Include="Vertex.cs" />
     <Compile Include="Window.cs">

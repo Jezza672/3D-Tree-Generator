@@ -105,6 +105,7 @@ namespace _3D_Tree_Generator
         public Vertex Transform(Matrix4 mat, Vector3 translation)
         {
             Position = new Vector3(mat * new Vector4(Position, 1)) + translation;
+            //Position = Vector3.Transform(Position, mat);
             return this;
         }
 

@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using _3D_Tree_Generator.Test_Classes;
 
 
 /* TODO:
@@ -61,14 +62,15 @@ namespace _3D_Tree_Generator
         {
 
             //Mesh mesh = new Mesh();
-            Mesh mesh = new TestCube();
+            Mesh mesh = new TestAxes();
             //mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
             Tree tree = new Tree(10f, 1f, Matrix4.CreateTranslation(new Vector3(0, -5, 0)));
             tree.GenerateTree();
             //mat = mat * Matrix4.CreateRotationX(2);
             //mesh = mesh.Transform(mat);
-            tree.Position = new Vector3(0, -5f, 0);
+            tree.Position = new Vector3(0, 0, 0);
             objects.Add(tree);
+            objects.Add(mesh);
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.0f, 40.0f);
 
@@ -78,7 +80,7 @@ namespace _3D_Tree_Generator
             glControl1.Paint += new PaintEventHandler(glControl1_Paint);
 
             initProgram(); // initialise shaders and VBOs
-            GL.ClearColor(Color.CornflowerBlue);
+            GL.ClearColor(Color.White);
             GL.Enable(EnableCap.DepthTest);
             GL.PointSize(5f);
 
@@ -189,6 +191,9 @@ namespace _3D_Tree_Generator
             //objects[0].Rotation = new Vector3(0, time * 0.001f,0);
             //objects[0] = objects[0].Transform(mat * Matrix4.CreateRotationX(0.01f) * mat.Inverted());
 
+            //camera.Rotate(new Vector3(0, 0.01f, 0));
+            camera.Update(glControl1);
+
             ViewProjectionMatrix = camera.ViewMatrix * ProjectionMatrix;
 
             foreach (Mesh ob in objects)
@@ -202,7 +207,6 @@ namespace _3D_Tree_Generator
 
             //Debug.WriteLine("Update");
         }
-
 
         private void glControl1_Paint(object sender, EventArgs e)
         {
@@ -257,5 +261,6 @@ namespace _3D_Tree_Generator
         //http://neokabuto.blogspot.co.uk/2013/02/opentk-tutorial-1-opening-windows-and.html
         //http://neokabuto.blogspot.co.uk/2013/03/opentk-tutorial-2-drawing-triangle.html
         //http://neokabuto.blogspot.co.uk/2013/07/opentk-tutorial-3-enter-third-dimension.html
+        //http://neokabuto.blogspot.co.uk/2014/01/opentk-tutorial-5-basic-camera.html
     }
 }

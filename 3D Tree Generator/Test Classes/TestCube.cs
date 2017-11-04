@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace _3D_Tree_Generator
+namespace _3D_Tree_Generator.Test_Classes
 {
     class TestCube : Mesh
     {
