@@ -56,24 +56,44 @@ namespace _3D_Tree_Generator
             Rotate(new Vector3(x, y, z));
         }
 
-        public void Update(Control control) { 
-
-            if (Control.MouseButtons == MouseButtons.Left)
+        public void Update(Control control) {
+            if (!control.ClientRectangle.Contains(Control.MousePosition))
             {
-                Point mousepos = control.PointToClient(Control.MousePosition);
-                if (nue)
-                {
+                return;
+            } 
+            switch (Control.MouseButtons)
+            {
+                case MouseButtons.Left:
+                    Point mousepos = control.PointToClient(Control.MousePosition);
+                    if (nue)
+                    {
+                        prevmouspos = mousepos;
+                        nue = false;
+                    }
+                    Rotate((mousepos.Y - prevmouspos.Y) * Sensitivity, (mousepos.X - prevmouspos.X) * Sensitivity, 0);
                     prevmouspos = mousepos;
-                    nue = false;
-                }               
-                Rotate((mousepos.Y - prevmouspos.Y) * Sensitivity, (mousepos.X - prevmouspos.X) * Sensitivity, 0);
-                prevmouspos = mousepos;
-            } else if (Control.MouseButtons == MouseButtons.None)
-            {
-                nue = true;
+                    break;
+                case MouseButtons.Right:
+                    nue = true;
+                    break;
+                case MouseButtons.Middle:
+                    nue = true;
+                    break;
+                default:
+                    nue = true;
+                    break;
             }
 
         } //https://msdn.microsoft.com/en-gb/library/system.windows.forms.control.pointtoclient.aspx
         //https://stackoverflow.com/questions/7795068/getting-the-mouse-window-coordinates-in-opentk-c-net
+
+        public void Zoom(Control control, MouseEventArgs e)
+        {
+            if (!control.ClientRectangle.Contains(Control.MousePosition))
+            {
+                return;
+            }
+            Position = Position * (1- Sensitivity * e.Delta * 0.1f);
+        }
     }
 }

@@ -43,6 +43,7 @@ namespace _3D_Tree_Generator
         List<Mesh> objects = new List<Mesh>();
 
         Camera camera = new Camera();
+        Tree tree = new Tree(10f, 1f, Matrix4.Identity);
 
         float time = 0.0f;
         const float fps = 20f;
@@ -50,25 +51,37 @@ namespace _3D_Tree_Generator
 
         Matrix4 ProjectionMatrix;
         Matrix4 ViewProjectionMatrix;
-        Matrix4 mat = Matrix4.CreateTranslation(new Vector3(0, 2, 0));
-        Random rand = new Random();
 
         public Window() //contructor for the window
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Repaint every frame.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        private void TimerTick(object source, EventArgs e)
+        {
+            glControl1_Paint(glControl1, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// GlControl Loaded in
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
             //Mesh mesh = new Mesh();
             Mesh mesh = new TestAxes();
             //mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
-            Tree tree = new Tree(10f, 1f, Matrix4.CreateTranslation(new Vector3(0, -5, 0)));
+            
             tree.GenerateTree();
             //mat = mat * Matrix4.CreateRotationX(2);
             //mesh = mesh.Transform(mat);
-            tree.Position = new Vector3(0, 0, 0);
             objects.Add(tree);
             objects.Add(mesh);
 
@@ -76,8 +89,8 @@ namespace _3D_Tree_Generator
 
             //glControl1.KeyDown += new KeyEventHandler(glControl1_KeyDown);  //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
             //glControl1.KeyUp += new KeyEventHandler(glControl1_KeyUp);
-            glControl1.Resize += new EventHandler(glControl1_Resize);
-            glControl1.Paint += new PaintEventHandler(glControl1_Paint);
+            //glControl1.Resize += new EventHandler(glControl1_Resize);
+            //glControl1.Paint += new PaintEventHandler(glControl1_Paint);
 
             initProgram(); // initialise shaders and VBOs
             GL.ClearColor(Color.White);
@@ -89,28 +102,11 @@ namespace _3D_Tree_Generator
             timer.Interval = (int)(1000 / fps);
 
             timer.Start();
+            autoRefreshToolStripMenuItem.Checked = true;
 
             update();
             glControl1_Resize(glControl1, EventArgs.Empty);   
         }
-
-        private void TimerTick(object source, EventArgs e)
-        {
-            update();
-            glControl1_Paint(glControl1, EventArgs.Empty);
-        }
-
-        private void glControl1_Resize(object sender, EventArgs e) //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
-        {
-            glControl1.MakeCurrent();
-            GLControl c = (GLControl) sender;
-            GL.Viewport(glControl1.ClientRectangle); //https://stackoverflow.com/questions/5858713/how-to-change-the-viewport-resolution-in-opentk
-            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.3f, 40.0f);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref perspective);
-            
-        }
-
 
         private void initProgram()
         {
@@ -140,6 +136,9 @@ namespace _3D_Tree_Generator
 
         }
 
+        /// <summary>
+        /// Call whenever anything is changed in the scene.
+        /// </summary>
         private void update()
         {
             time += timer.Interval;
@@ -192,7 +191,6 @@ namespace _3D_Tree_Generator
             //objects[0] = objects[0].Transform(mat * Matrix4.CreateRotationX(0.01f) * mat.Inverted());
 
             //camera.Rotate(new Vector3(0, 0.01f, 0));
-            camera.Update(glControl1);
 
             ViewProjectionMatrix = camera.ViewMatrix * ProjectionMatrix;
 
@@ -206,6 +204,17 @@ namespace _3D_Tree_Generator
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // unbind the buffers (bind null buffer)
 
             //Debug.WriteLine("Update");
+        }
+
+        private void glControl1_Resize(object sender, EventArgs e) //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
+        {
+            glControl1.MakeCurrent();
+            GLControl c = (GLControl)sender;
+            GL.Viewport(glControl1.ClientRectangle); //https://stackoverflow.com/questions/5858713/how-to-change-the-viewport-resolution-in-opentk
+            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.3f, 40.0f);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref perspective);
+
         }
 
         private void glControl1_Paint(object sender, EventArgs e)
@@ -238,6 +247,39 @@ namespace _3D_Tree_Generator
             GL.Flush();
             glControl1.SwapBuffers();
             //Debug.WriteLine("Paint");
+        }
+
+        private void glControl1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            camera.Zoom(glControl1, e);
+        }
+
+        private void glControl1_MouseMove(object sender, MouseEventArgs e)
+        {
+            camera.Update(glControl1);
+            update();
+        }
+
+        private void RefreshButton_Click(object sender, EventArgs e)
+        {
+            tree.GenerateTree();
+            update();
+        }
+
+        private void ValueChanged(object sender, EventArgs e)
+        {
+            if (sender.GetType() == typeof(NumericUpDown))
+            {
+                //Debug.WriteLine("wroks");
+                NumericUpDown num = sender as NumericUpDown;
+                var property = tree.GetType().GetProperty(num.AccessibleName);  //https://stackoverflow.com/questions/737151/how-to-get-the-list-of-properties-of-a-class
+                property.SetValue(tree, Convert.ChangeType(num.Value, property.PropertyType));              
+                if (this.autoRefreshToolStripMenuItem.Checked)
+                {
+                    tree.GenerateTree();
+                    update();
+                }
+            }
         }
 
         void loadShader(String filename, ShaderType type, int program, out int address)

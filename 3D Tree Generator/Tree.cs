@@ -24,6 +24,7 @@ namespace _3D_Tree_Generator
         public float MinRadius { get; set; }
         public int Quality { get; set; }
         public float Alpha { get; set; }
+        public float Beta { get; set; }
 
         public Tree(float height, float radius, Matrix4 position)
         {
@@ -36,6 +37,7 @@ namespace _3D_Tree_Generator
             MinHeight = 0.1f;
             MinRadius = 0.1f;
             Alpha = 0.1f;
+            Beta = 0.05f;
         }
 
         /// <summary>
@@ -73,23 +75,29 @@ namespace _3D_Tree_Generator
             Tris = GenerateTree(TrunkRadius, Height / (float)(TrunkRadius/0.02)).Item2.Tris;
         }
 
+        /// <summary>
+        /// returns the vertices of current slice, and the mesh of the slices after this one
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="segmentHeight"></param>
+        /// <returns></returns>
         public Tuple<Vertex[], Mesh> GenerateTree(float radius, float segmentHeight)
         {
             List<Vertex> verts = new List<Vertex>();
-            verts.AddRange(CreateCrossSection(radius, Quality));
+            verts.AddRange(CreateCrossSection(radius, Quality)); //add the current slice
 
-            if (radius < 0.02)
+            if (radius < 0.02) //if too small, stop recurtion
             {
                 return new Tuple<Vertex[], Mesh>(verts.ToArray(), new Mesh());
             }
 
-            Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight);
+            Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight); //get the next bits of the tree.
                   
-            Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(0.05f);
+            Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(Beta); //translation matrix for bits after
             
-            verts.AddRange(result.Item1.Select(i => i.Transformed(matrix)));
+            verts.AddRange(result.Item1.Select(i => i.Transformed(matrix))); //add the new vertices
 
-            Tri[] tris = new Tri[Quality * 2];
+            Tri[] tris = new Tri[Quality * 2]; //creates the new triangles
             for (int i = 0; i < Quality; i++)
             {
                 tris[i] = new Tri(verts[i], verts[(i + 1) % Quality], verts[i + Quality]);
