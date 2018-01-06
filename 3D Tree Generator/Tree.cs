@@ -75,7 +75,7 @@ namespace _3D_Tree_Generator
         public void GenerateTree()
         {
             Random rnd = new Random(Seed);
-            Tris = GenerateTree(TrunkRadius, Height / (float)(TrunkRadius/0.02), rnd).Item2.Tris;
+            Tris = GenerateTree(TrunkRadius, Height / (float)(TrunkRadius/0.02), rnd, 0).Item2.Tris;
         }
 
         /// <summary>
@@ -84,10 +84,10 @@ namespace _3D_Tree_Generator
         /// <param name="radius"></param>
         /// <param name="segmentHeight"></param>
         /// <returns></returns>
-        public Tuple<Vertex[], Mesh> GenerateTree(float radius, float segmentHeight, Random rnd, int i)
+        public Tuple<Vertex[], Mesh> GenerateTree(float radius, float segmentHeight, Random rnd, int col)
         {
             List<Vertex> verts = new List<Vertex>();
-            verts.AddRange(CreateCrossSection(radius, Quality, i)); //add the current slice
+            verts.AddRange(CreateCrossSection(radius, Quality, col)); //add the current slice
 
             if (radius < 0.02) //if too small, stop recurtion
             {
@@ -97,12 +97,12 @@ namespace _3D_Tree_Generator
             List<Tri> branchTris = new List<Tri>();
             if (rnd.Next(100) < 10)
             {
-                Mesh branch = GenerateTree(radius / 1.5f, segmentHeight, rnd, i + 1).Item2;
+                Mesh branch = GenerateTree(radius / 1.5f, segmentHeight, rnd, col + 1).Item2;
                 Matrix4 branchMat = Matrix4.CreateRotationX(1) * Matrix4.CreateRotationY((float) rnd.NextDouble());
-                branchTris =  branch.Tris.Select(i => i.Transformed(branchMat)).ToList();
+                branchTris =  branch.Tris.Select(x => x.Transformed(branchMat)).ToList();
             }
 
-            Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight, rnd, i + 1); //get the next bits of the tree.
+            Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight, rnd, col + 1); //get the next bits of the tree.
                   
             Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(Beta) * Matrix4.CreateRotationY(0.1f); //translation matrix for bits after
             
