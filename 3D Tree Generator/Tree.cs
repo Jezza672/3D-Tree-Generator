@@ -19,7 +19,7 @@ namespace _3D_Tree_Generator
         public float Height {get; set;}
         public float TrunkRadius { get; set; }
         public float Noise{get; set;}
-        public int Branching {get; set;}
+        public float Branching {get; set;}
         public int Seed { get; set; }
         public float MinHeight { get; set; }
         public float MinRadius { get; set; }
@@ -32,14 +32,14 @@ namespace _3D_Tree_Generator
             Height = height;
             TrunkRadius = radius;
             Noise = 0;
-            Branching = 1;
+            Branching = 0.1f;
             Seed = 100;
             Quality = 3;
             MinHeight = 0.1f;
             MinRadius = 0.1f;
             Alpha = 0.1f;
             Beta = 0.05f;
-            
+            IsTextured = false;
         }
 
         /// <summary>
@@ -95,10 +95,10 @@ namespace _3D_Tree_Generator
             }
 
             List<Tri> branchTris = new List<Tri>();
-            if (rnd.Next(100) < 10)
+            if (rnd.NextDouble() < Branching)
             {
                 Mesh branch = GenerateTree(radius / 1.5f, segmentHeight, rnd, col + 1).Item2;
-                Matrix4 branchMat = Matrix4.CreateRotationX(1) * Matrix4.CreateRotationY((float) rnd.NextDouble());
+                Matrix4 branchMat = Matrix4.CreateRotationX(1) * Matrix4.CreateRotationY((float) (rnd.NextDouble() * Math.PI * 2));
                 branchTris =  branch.Tris.Select(x => x.Transformed(branchMat)).ToList();
             }
 
@@ -122,6 +122,13 @@ namespace _3D_Tree_Generator
             return new Tuple<Vertex[], Mesh>(verts.Take(Quality).ToArray(), mesh);           //https://stackoverflow.com/questions/943635/getting-a-sub-array-from-an-existing-array
         }
 
+        /// <summary>
+        /// Created a regular <paramref name="horizontalSegments"/> sided shape
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="horizontalSegments"></param>
+        /// <param name="num"></param>
+        /// <returns>array ov vertices</returns>
         public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, int num)
         {
             Vertex[] verts = new Vertex[horizontalSegments];
@@ -129,7 +136,8 @@ namespace _3D_Tree_Generator
 
             for (int i = 0; i < horizontalSegments; i++)
             {
-                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i)), Vector3.Zero, new Vector3(i));
+                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i)), Vector3.Zero, new Vector3((float)num/100f));
+                Debug.WriteLine(verts[i].ToStringFull());
             }
 
             // Debug.WriteLine("tris: " + String.Join(", \n", tris.Select(p => p.ToString()).ToArray()));

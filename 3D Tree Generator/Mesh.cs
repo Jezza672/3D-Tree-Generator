@@ -153,7 +153,6 @@ namespace _3D_Tree_Generator
             rotation = Vector3.Zero;
             scale = Vector3.One;
             CalculateModelMatrix();
-            ModelMatrix = Matrix4.Identity;
             ModelViewProjectionMatrix = Matrix4.Identity;
             tris = new Tri[] { new Tri()};
         }
@@ -399,7 +398,7 @@ namespace _3D_Tree_Generator
 
         public Mesh Transform(Matrix4 mat)
         {
-            Debug.WriteLine(mat);
+            //Debug.WriteLine(mat);
             Vector3 translation = mat.ExtractTranslation();
             //Debug.WriteLine(translation);
             //Debug.WriteLine(new Vector3(mat * new Vector4(new Vector3(0f,1.0f,0f), 1.0f)) + translation);
@@ -425,6 +424,49 @@ namespace _3D_Tree_Generator
         public static Mesh operator +(Mesh left, Mesh right)
         {
             return new Mesh(left.Tris.Concat(right.Tris).ToArray());   //https://stackoverflow.com/questions/59217/merging-two-arrays-in-net
+        }
+
+        public void Recalculate()
+        {
+            Vector3[] normals = new Vector3[tris.Length * 3];
+            for (int i = 0; i < tris.Length; i++)
+            {
+                //Debug.WriteLine(tris[i].Item1);
+                normals[i * 3] = tris[i].Item1.Normal;
+                normals[i * 3 + 1] = tris[i].Item2.Normal;
+                normals[i * 3 + 2] = tris[i].Item3.Normal;
+            }
+            Normals = normals;
+
+            int[] indices = Enumerable.Range(0, Tris.Length * 3).ToArray();
+            Indices = indices;
+
+            Vector3[] vertices = new Vector3[tris.Length * 3];
+            for (int i = 0; i < tris.Length; i++)
+            {
+                vertices[i * 3] = tris[i].Item1.Position;
+                vertices[i * 3 + 1] = tris[i].Item2.Position;
+                vertices[i * 3 + 2] = tris[i].Item3.Position;
+            }
+            Vertices = vertices;
+
+            Vector3[] colours = new Vector3[tris.Length * 3];
+            for (int i = 0; i < tris.Length; i++)
+            {
+                colours[i * 3] = tris[i].Item1.Color;
+                colours[i * 3 + 1] = tris[i].Item2.Color;
+                colours[i * 3 + 2] = tris[i].Item3.Color;
+            }
+            Colors = colours;
+
+            Vector2[] texcoords = new Vector2[tris.Length * 3];
+            for (int i = 0; i < tris.Length; i++)
+            {
+                texcoords[i * 3] = tris[i].Item1.TextureCoord;
+                texcoords[i * 3 + 1] = tris[i].Item2.TextureCoord;
+                texcoords[i * 3 + 2] = tris[i].Item3.TextureCoord;
+            }
+            TexCoords = texcoords;
         }
     }
 }

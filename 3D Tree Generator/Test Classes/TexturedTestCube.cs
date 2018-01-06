@@ -20,8 +20,13 @@ namespace _3D_Tree_Generator.Test_Classes
     {
         public TexturedTestCube() : base("Resources/Objects/Cube.obj")
         {
+            Debug.WriteLine(String.Join("\n", Tris.Select(i => i.ToStringFull()).ToArray()));
+            Recalculate();
             Texture = new Texture("Resources/Textures/TestTexture.jpg");
             IsTextured = true;
+            Name = "TexturedTestCube";
+            Position = new Vector3(0, 0, 0);
+
         }
 
     }

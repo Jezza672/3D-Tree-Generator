@@ -126,7 +126,7 @@ namespace _3D_Tree_Generator
         /// <returns></returns>
         public Vertex Transformed(Matrix4 mat, Vector3 translation)
         {
-            return new Vertex(Position, Normal, TextureCoord).Transform(mat, translation);
+            return new Vertex(Position, Normal, TextureCoord, Color).Transform(mat, translation);
         }
 
         /// <summary>
@@ -136,12 +136,22 @@ namespace _3D_Tree_Generator
         /// <returns></returns>
         public Vertex Transformed(Matrix4 mat)
         {
-            return new Vertex(Position, Normal, TextureCoord).Transform(mat);
+            return new Vertex(Position, Normal, TextureCoord, Color).Transform(mat);
         }
 
         public override string ToString()
         {
             return Position.ToString();
+        }
+
+        public string ToStringFull()
+        {
+            string str = "Vertex: \n";
+            str += string.Format("Position: {0} \n", Position.ToString());
+            str += string.Format("Normal: {0} \n", Normal.ToString());
+            str += string.Format("Color: {0} \n", Color.ToString());
+            str += string.Format("TexCoord: {0} \n", TextureCoord.ToString());
+            return str;
         }
     }
 }

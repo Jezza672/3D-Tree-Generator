@@ -174,26 +174,26 @@ namespace _3D_Tree_Generator
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.newToolStripMenuItem.Text = "New";
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.Open);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAs);
             // 
@@ -204,7 +204,7 @@ namespace _3D_Tree_Generator
             this.forrestToolStripMenuItem,
             this.environmentToolStripMenuItem1});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // currentTreeToolStripMenuItem
@@ -228,7 +228,7 @@ namespace _3D_Tree_Generator
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.closeToolStripMenuItem.Text = "Close";
             // 
             // editToolStripMenuItem
@@ -389,6 +389,11 @@ namespace _3D_Tree_Generator
             0,
             65536});
             this.Branching.Location = new System.Drawing.Point(955, 127);
+            this.Branching.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.Branching.Name = "Branching";
             this.Branching.Size = new System.Drawing.Size(43, 20);
             this.Branching.TabIndex = 4;
@@ -396,7 +401,7 @@ namespace _3D_Tree_Generator
             1,
             0,
             0,
-            0});
+            65536});
             this.Branching.ValueChanged += new System.EventHandler(this.ValueChanged);
             // 
             // label3
@@ -487,6 +492,7 @@ namespace _3D_Tree_Generator
             this.Seed.Name = "Seed";
             this.Seed.Size = new System.Drawing.Size(81, 20);
             this.Seed.TabIndex = 12;
+            this.Seed.ValueChanged += new System.EventHandler(this.ValueChanged);
             // 
             // label6
             // 

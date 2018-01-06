@@ -82,13 +82,15 @@ namespace _3D_Tree_Generator
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
-            tree.GenerateTree();
+            //tree.GenerateTree();
 
-            //objects.Add(new TestCube(new Vector3(0,1,0)));
-            //objects.Add(new TexturedTestCube());
-            objects.Add(tree);
+            objects.Add(new TestCube(new Vector3(0,4,0)));
+            
+            //objects.Add(tree);
             objects.Add(new TestAxes());
+            objects.Add(new TexturedTestCube());
             //objects.Add(new Mesh("Resources/Objects/Car.obj"));
+            Debug.WriteLine("Objects: \n" + String.Join("\n", objects));
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 0.5f, 100.0f);
 
@@ -120,7 +122,7 @@ namespace _3D_Tree_Generator
 
             shaders.Add("default", new Shader("Resources/Shaders/vs.glsl", "Resources/Shaders/fs.glsl", true));
             shaders.Add("textured", new Shader("Resources/Shaders/vs_tex.glsl", "Resources/Shaders/fs_tex.glsl", true));
-            activeShader = "default";
+            activeShader = "textured";
 
         }
 
@@ -140,6 +142,13 @@ namespace _3D_Tree_Generator
             int vertcount = 0;
             foreach (Mesh v in objects) // add data from each object in turn
             {
+                if (v.Name == "TexturedTestCube")
+                {
+                    Debug.WriteLine(v.Vertices.Length + " Verts are: " + String.Join(", ", v.Vertices));
+                    Debug.WriteLine(v.Colors.Length + " Colors are: " + String.Join(", ", v.Colors));
+                    Debug.WriteLine(v.Indices.Length + " Indices are: " + String.Join(", ", v.Indices));
+                    Debug.WriteLine(v.TexCoords.Length + " Textcoords are: " + String.Join(", ", v.TexCoords));
+                }
                 verts.AddRange(v.Vertices);
 
                 colors.AddRange(v.Colors);
@@ -177,6 +186,7 @@ namespace _3D_Tree_Generator
 
             if (shaders[activeShader].GetAttribute("texcoord") != -1) //writes texture coordinates to vbo if shader has them
             {
+                Debug.WriteLine("Binding TexCoords");
                 GL.BindBuffer(BufferTarget.ArrayBuffer, shaders[activeShader].GetBuffer("texcoord"));
                 GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, (IntPtr)(texcoorddata.Length * Vector2.SizeInBytes), texcoorddata, BufferUsageHint.StaticDraw);
                 GL.VertexAttribPointer(shaders[activeShader].GetAttribute("texcoord"), 2, VertexAttribPointerType.Float, true, 0, 0);
@@ -236,16 +246,22 @@ namespace _3D_Tree_Generator
 
             foreach (Mesh v in objects)
             {
-                GL.UniformMatrix4(shaders[activeShader].GetUniform("modelview"), false, ref v.ModelViewProjectionMatrix);
-                //Debug.WriteLine(v.IsTextured);
                 if (v.IsTextured)
                 {
                     GL.ActiveTexture(TextureUnit.Texture0);
                     GL.BindTexture(TextureTarget.Texture2D, v.Texture.TexID);
+                }
+                
+                GL.UniformMatrix4(shaders[activeShader].GetUniform("modelview"), false, ref v.ModelViewProjectionMatrix);
+                //Debug.WriteLine(v.IsTextured);
+                if (v.IsTextured)
+                {
                     if (shaders[activeShader].GetUniform("maintexture") != -1)
                     {
                         GL.Uniform1(shaders[activeShader].GetUniform("maintexture"), 0);
+                        Debug.WriteLine("Sent Texture");
                     }
+
                 }
                 GL.DrawElements(BeginMode.Triangles, v.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint));
                 indiceat += v.Indices.Length;

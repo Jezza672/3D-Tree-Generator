@@ -56,6 +56,11 @@ namespace _3D_Tree_Generator
             return "Tri: " + Item1 +  ", " + Item2 + ", " + Item3;
         }
 
+        public string ToStringFull()
+        {
+            return "Tri: \n" + Item1.ToStringFull() + Item1.ToStringFull() + Item1.ToStringFull();
+        }
+
         public Tri Transformed(Matrix4 matrix)
         {
             Tri tri = new Tri();

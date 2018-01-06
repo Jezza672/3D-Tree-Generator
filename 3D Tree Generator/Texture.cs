@@ -35,13 +35,13 @@ namespace _3D_Tree_Generator
 
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            Debug.WriteLine(String.Format("TexID: {0}", (TexID)));
+            //Debug.WriteLine(String.Format("TexID: {0}", (TexID)));
 
         }
 
         public Texture(string filename) : this(ConvertToBitmap(filename))
         {
-            Debug.WriteLine(String.Format("Loaded {0}", (filename)));
+            Debug.WriteLine(String.Format("Loaded {0} with TexID {1}", filename, TexID));
         }
 
         public static Bitmap ConvertToBitmap(string fileName) //https://stackoverflow.com/questions/24383256/how-can-i-convert-a-jpg-file-into-a-bitmap-using-c
