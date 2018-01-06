@@ -56,15 +56,30 @@ namespace _3D_Tree_Generator
             Rotate(new Vector3(x, y, z));
         }
 
+        public void Move(Vector2 movement)
+        {
+            Vector3 vec = LookingAt - Position;
+            //Vector3 movex = - Vector3.Cross(vec, new Vector3(0, 1, 0)) * movement.Y * Sensitivity * 100;
+
+            Position = Position + new Vector3(vec.X, vec.Y, 0) * movement.Y ;
+            LookingAt = vec + Position;
+        }
+
+        public void Move(float x, float y)
+        {
+            Move(new Vector2(x, y));
+        }
+
         public void Update(Control control) {
-            if (!control.ClientRectangle.Contains(Control.MousePosition))
+            Point mousepos = control.PointToClient(Control.MousePosition);
+            if (!control.ClientRectangle.Contains(mousepos))
             {
                 return;
             } 
             switch (Control.MouseButtons)
             {
                 case MouseButtons.Left:
-                    Point mousepos = control.PointToClient(Control.MousePosition);
+                    ;
                     if (nue)
                     {
                         prevmouspos = mousepos;
@@ -77,7 +92,15 @@ namespace _3D_Tree_Generator
                     nue = true;
                     break;
                 case MouseButtons.Middle:
-                    nue = true;
+                    /*
+                    if (nue)
+                    {
+                        prevmouspos = mousepos;
+                        nue = false;
+                    }
+                    Move((mousepos.Y - prevmouspos.Y) * Sensitivity, (mousepos.X - prevmouspos.X) * Sensitivity);
+                    prevmouspos = mousepos;
+                    */
                     break;
                 default:
                     nue = true;
@@ -89,11 +112,13 @@ namespace _3D_Tree_Generator
 
         public void Zoom(Control control, MouseEventArgs e)
         {
-            if (!control.ClientRectangle.Contains(Control.MousePosition))
+            if (!control.ClientRectangle.Contains(control.PointToClient(Control.MousePosition)))
             {
                 return;
             }
+            Position = Position - LookingAt;
             Position = Position * (1- Sensitivity * e.Delta * 0.1f);
+            Position = Position + LookingAt;
         }
     }
 }

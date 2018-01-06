@@ -11,6 +11,7 @@ using System.Drawing;
 
 namespace _3D_Tree_Generator
 {
+    [Serializable]
     class Tri : IEnumerable<Vertex>
     {
         public Vertex Item1;
@@ -53,6 +54,23 @@ namespace _3D_Tree_Generator
         public override string ToString()
         {
             return "Tri: " + Item1 +  ", " + Item2 + ", " + Item3;
+        }
+
+        public Tri Transformed(Matrix4 matrix)
+        {
+            Tri tri = new Tri();
+            tri.Item1 = Item1.Transformed(matrix);
+            tri.Item2 = Item2.Transformed(matrix);
+            tri.Item3 = Item3.Transformed(matrix);
+            return tri;
+        }
+
+        public Tri Transform(Matrix4 matrix)
+        {
+            Item1 = Item1.Transformed(matrix);
+            Item2 = Item2.Transformed(matrix);
+            Item3 = Item3.Transformed(matrix);
+            return this;
         }
     }
 }

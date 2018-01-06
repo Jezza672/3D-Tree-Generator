@@ -13,6 +13,7 @@ using System.Diagnostics;
 
 namespace _3D_Tree_Generator
 {
+    [Serializable]
     class Tree : Mesh
     {
         public float Height {get; set;}
@@ -38,6 +39,7 @@ namespace _3D_Tree_Generator
             MinRadius = 0.1f;
             Alpha = 0.1f;
             Beta = 0.05f;
+            
         }
 
         /// <summary>
@@ -72,7 +74,8 @@ namespace _3D_Tree_Generator
 
         public void GenerateTree()
         {
-            Tris = GenerateTree(TrunkRadius, Height / (float)(TrunkRadius/0.02)).Item2.Tris;
+            Random rnd = new Random(Seed);
+            Tris = GenerateTree(TrunkRadius, Height / (float)(TrunkRadius/0.02), rnd).Item2.Tris;
         }
 
         /// <summary>
@@ -81,19 +84,27 @@ namespace _3D_Tree_Generator
         /// <param name="radius"></param>
         /// <param name="segmentHeight"></param>
         /// <returns></returns>
-        public Tuple<Vertex[], Mesh> GenerateTree(float radius, float segmentHeight)
+        public Tuple<Vertex[], Mesh> GenerateTree(float radius, float segmentHeight, Random rnd, int i)
         {
             List<Vertex> verts = new List<Vertex>();
-            verts.AddRange(CreateCrossSection(radius, Quality)); //add the current slice
+            verts.AddRange(CreateCrossSection(radius, Quality, i)); //add the current slice
 
             if (radius < 0.02) //if too small, stop recurtion
             {
                 return new Tuple<Vertex[], Mesh>(verts.ToArray(), new Mesh());
             }
 
-            Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight); //get the next bits of the tree.
+            List<Tri> branchTris = new List<Tri>();
+            if (rnd.Next(100) < 10)
+            {
+                Mesh branch = GenerateTree(radius / 1.5f, segmentHeight, rnd, i + 1).Item2;
+                Matrix4 branchMat = Matrix4.CreateRotationX(1) * Matrix4.CreateRotationY((float) rnd.NextDouble());
+                branchTris =  branch.Tris.Select(i => i.Transformed(branchMat)).ToList();
+            }
+
+            Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight, rnd, i + 1); //get the next bits of the tree.
                   
-            Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(Beta); //translation matrix for bits after
+            Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(Beta) * Matrix4.CreateRotationY(0.1f); //translation matrix for bits after
             
             verts.AddRange(result.Item1.Select(i => i.Transformed(matrix))); //add the new vertices
 
@@ -107,17 +118,18 @@ namespace _3D_Tree_Generator
             Mesh mesh = result.Item2;
             mesh = mesh.Transform(matrix);
             mesh.AddTris(tris);
+            mesh.AddTris(branchTris.ToArray());
             return new Tuple<Vertex[], Mesh>(verts.Take(Quality).ToArray(), mesh);           //https://stackoverflow.com/questions/943635/getting-a-sub-array-from-an-existing-array
         }
 
-        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments)
+        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, int num)
         {
             Vertex[] verts = new Vertex[horizontalSegments];
             double theta = 2 * Math.PI / horizontalSegments;
 
             for (int i = 0; i < horizontalSegments; i++)
             {
-                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i)));
+                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i)), Vector3.Zero, new Vector3(i));
             }
 
             // Debug.WriteLine("tris: " + String.Join(", \n", tris.Select(p => p.ToString()).ToArray()));

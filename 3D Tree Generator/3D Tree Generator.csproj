@@ -55,7 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Shader.cs" />
     <Compile Include="Test Classes\TestAxes.cs" />
+    <Compile Include="Test Classes\TexturedTestCube.cs" />
+    <Compile Include="Texture.cs" />
     <Compile Include="Tri.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Object.cs" />
@@ -84,6 +87,7 @@
     </Compile>
     <None Include="Resources\Objects\Car.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Resources\Objects\Cube.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -99,15 +103,26 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="fs.glsl">
+    <None Include="Resources\Shaders\fs.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="vs.glsl">
+    <None Include="Resources\Shaders\fs_tex.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Shaders\vs.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Shaders\vs_tex.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Textures\TestTexture.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

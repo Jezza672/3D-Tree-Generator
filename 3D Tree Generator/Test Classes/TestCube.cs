@@ -92,7 +92,7 @@ namespace _3D_Tree_Generator.Test_Classes
                 new Vector3(1, 0, 0),
                 new Vector3(0, 1, 0),
                 new Vector3(0, 0, 1)
-            }.ToList();
+            };
 
             Debug.WriteLine(String.Format("Created Test Cube at {0}", Position.ToString()));
         }

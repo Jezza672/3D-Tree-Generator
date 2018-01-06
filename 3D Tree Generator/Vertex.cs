@@ -11,6 +11,7 @@ using System.Drawing;
 
 namespace _3D_Tree_Generator
 {
+    [Serializable]
     class Vertex
     {
         public Vector3 Position;
@@ -68,6 +69,14 @@ namespace _3D_Tree_Generator
             Normal = normal;
             TextureCoord = texturecoordinate;
             Color = new Vector3(0, 0, 0);
+        }
+
+        public Vertex(Vector3 position, Vector3 normal, Vector2 texturecoordinate, Vector3 color)
+        {
+            Position = position;
+            Normal = normal;
+            TextureCoord = texturecoordinate;
+            Color = color;
         }
 
         /// <summary>

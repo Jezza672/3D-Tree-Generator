@@ -39,6 +39,7 @@ namespace _3D_Tree_Generator
         Vector3[] vertdata; // array of vertices to send to buffers
         int[] indicedata;
         Vector3[] coldata; // " colors
+        Vector2[] texcoorddata;
 
         List<Mesh> objects = new List<Mesh>();
 
@@ -48,6 +49,12 @@ namespace _3D_Tree_Generator
         float time = 0.0f;
         const float fps = 20f;
         Timer timer;
+
+        Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
+        string activeShader = "default";
+
+
+        Dictionary<string, Texture> Textures = new Dictionary<string, Texture>();
 
         Matrix4 ProjectionMatrix;
         Matrix4 ViewProjectionMatrix;
@@ -75,17 +82,15 @@ namespace _3D_Tree_Generator
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
-            //Mesh mesh = new Mesh();
-            Mesh mesh = new TestAxes();
-            //mesh = Mesh.MeshFromFile("Resources/Objects/Car.obj");
-            
             tree.GenerateTree();
-            //mat = mat * Matrix4.CreateRotationX(2);
-            //mesh = mesh.Transform(mat);
-            objects.Add(tree);
-            objects.Add(mesh);
 
-            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.0f, 40.0f);
+            //objects.Add(new TestCube(new Vector3(0,1,0)));
+            //objects.Add(new TexturedTestCube());
+            objects.Add(tree);
+            objects.Add(new TestAxes());
+            //objects.Add(new Mesh("Resources/Objects/Car.obj"));
+
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 0.5f, 100.0f);
 
             //glControl1.KeyDown += new KeyEventHandler(glControl1_KeyDown);  //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
             //glControl1.KeyUp += new KeyEventHandler(glControl1_KeyUp);
@@ -105,34 +110,17 @@ namespace _3D_Tree_Generator
             autoRefreshToolStripMenuItem.Checked = true;
 
             update();
-            glControl1_Resize(glControl1, EventArgs.Empty);   
+            glControl1_Resize(glControl1, EventArgs.Empty);
+            
         }
 
         private void initProgram()
         {
-            pgmID = GL.CreateProgram(); //creates the program
-
-            loadShader("vs.glsl", ShaderType.VertexShader, pgmID, out vsID); //loads shaders
-            loadShader("fs.glsl", ShaderType.FragmentShader, pgmID, out fsID);
-
-            GL.LinkProgram(pgmID); //links the program once created
-            Debug.WriteLine(GL.GetProgramInfoLog(pgmID)); //debug dump from linking
-
-            attribute_vpos = GL.GetAttribLocation(pgmID, "vPosition");  // finds locations of shader attributes in the shader
-            attribute_vcol = GL.GetAttribLocation(pgmID, "vColor");
-            uniform_mview = GL.GetUniformLocation(pgmID, "modelview");
-
-            if (attribute_vpos == -1 || attribute_vcol == -1 || uniform_mview == -1) // check to make sure they exist
-            {
-                Debug.WriteLine("Error binding attributes");
-            }
-
-            GL.GenBuffers(1, out vbo_position);  //creates the VBOs
             GL.GenBuffers(1, out ibo_elements);
-            GL.GenBuffers(1, out vbo_color);
-            GL.GenBuffers(1, out vbo_mview);
 
-            
+            shaders.Add("default", new Shader("Resources/Shaders/vs.glsl", "Resources/Shaders/fs.glsl", true));
+            shaders.Add("textured", new Shader("Resources/Shaders/vs_tex.glsl", "Resources/Shaders/fs_tex.glsl", true));
+            activeShader = "default";
 
         }
 
@@ -147,59 +135,64 @@ namespace _3D_Tree_Generator
             List<Vector3> verts = new List<Vector3>(); // create lists for adding all data from every object
             List<int> inds = new List<int>();
             List<Vector3> colors = new List<Vector3>();
+            List<Vector2> texcoords = new List<Vector2>();
+
             int vertcount = 0;
             foreach (Mesh v in objects) // add data from each object in turn
             {
                 verts.AddRange(v.Vertices);
 
                 colors.AddRange(v.Colors);
-
-                Vector3[] tempcols = new Vector3[v.Vertices.Length-v.Colors.Count];
-                for (int i = 0; i < tempcols.Length; i++)
-                {
-                    //tempcols[i] = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
-                    tempcols[i] = new Vector3((0f+(float)i) / 255f, 69f / 255f, 19f / 255f);
-                }
-                colors.AddRange(tempcols);
+                
+                texcoords.AddRange(v.TexCoords);
 
                 foreach (int ind in v.Indices)
                 {
                     inds.Add(ind + vertcount); // offset indices as verts go into a combined big list
                 }
                 vertcount += v.Vertices.Length;
+
             }
             vertdata = verts.ToArray(); // turn lists to arrays
             indicedata = inds.ToArray();
             coldata = colors.ToArray();
+            texcoorddata = texcoords.ToArray();
+
 
             //Debug.WriteLine("Verts: " + String.Join(", ", vertdata.Select(p => p.ToString()).ToArray()));  //https://stackoverflow.com/questions/380708/shortest-method-to-convert-an-array-to-a-string-in-c-linq
             //Debug.WriteLine("inds: " + String.Join(", ", indicedata.Select(p => p.ToString()).ToArray()));
             //Debug.WriteLine("cols: " + String.Join(", ", coldata.Select(p => p.ToString()).ToArray()));
+            //Debug.WriteLine("texs: " + String.Join(", ", texcoorddata.Select(p => p.ToString()).ToArray()));
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_position); //start writing to the position VBO
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(vertdata.Length * Vector3.SizeInBytes), vertdata, BufferUsageHint.StaticDraw); //write data
-            GL.VertexAttribPointer(attribute_vpos, 3, VertexAttribPointerType.Float, false, 0, 0); // tell it to use this vbo for vpositon
+            GL.BindBuffer(BufferTarget.ArrayBuffer, shaders[activeShader].GetBuffer("vPosition")); //writes all vertices to the vbo
+            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(vertdata.Length * Vector3.SizeInBytes), vertdata, BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(shaders[activeShader].GetAttribute("vPosition"), 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_color); //colors
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(coldata.Length * Vector3.SizeInBytes), coldata, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(attribute_vcol, 3, VertexAttribPointerType.Float, true, 0, 0);
+            if (shaders[activeShader].GetAttribute("vColor") != -1) //writes all colours to vbo if the shader has it
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, shaders[activeShader].GetBuffer("vColor"));
+                GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(coldata.Length * Vector3.SizeInBytes), coldata, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(shaders[activeShader].GetAttribute("vColor"), 3, VertexAttribPointerType.Float, true, 0, 0);
+            }
+
+            if (shaders[activeShader].GetAttribute("texcoord") != -1) //writes texture coordinates to vbo if shader has them
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, shaders[activeShader].GetBuffer("texcoord"));
+                GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, (IntPtr)(texcoorddata.Length * Vector2.SizeInBytes), texcoorddata, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(shaders[activeShader].GetAttribute("texcoord"), 2, VertexAttribPointerType.Float, true, 0, 0);
+            }
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo_elements); //indices
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indicedata.Length * sizeof(int)), indicedata, BufferUsageHint.StaticDraw);
-
-            //objects[0].Rotation = new Vector3(0, time * 0.001f,0);
-            //objects[0] = objects[0].Transform(mat * Matrix4.CreateRotationX(0.01f) * mat.Inverted());
-
-            //camera.Rotate(new Vector3(0, 0.01f, 0));
 
             ViewProjectionMatrix = camera.ViewMatrix * ProjectionMatrix;
 
             foreach (Mesh ob in objects)
             {
                 ob.CalculateModelViewProjectionMatrix(ViewProjectionMatrix);
-            } 
+            }
 
-            GL.UseProgram(pgmID); //use our shader program
+            GL.UseProgram(shaders[activeShader].ProgramID); //use our active shader program
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // unbind the buffers (bind null buffer)
 
@@ -217,31 +210,49 @@ namespace _3D_Tree_Generator
 
         }
 
+        private void glControl1_Move(object sender, EventArgs e)
+        {
+            glControl1.MakeCurrent();
+            GLControl c = (GLControl)sender;
+            GL.Viewport(glControl1.ClientRectangle); //https://stackoverflow.com/questions/5858713/how-to-change-the-viewport-resolution-in-opentk
+            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 1.3f, 40.0f);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref perspective);
+        }
+
         private void glControl1_Paint(object sender, EventArgs e)
         {
             //update(); //remove once updates are called by events
 
             //GL.Viewport(0, 0, glControl1.Width, glControl1.Height);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
 
 
-            GL.EnableVertexAttribArray(attribute_vpos); //enable position vbo
-            GL.EnableVertexAttribArray(attribute_vcol); // enable color vbo
+
+            shaders[activeShader].EnableVertexAttribArrays();
+
 
             int indiceat = 0;
 
-            foreach (Mesh ob in objects)
+            foreach (Mesh v in objects)
             {
-                //Debug.WriteLine(ob.ToString());
-                GL.UniformMatrix4(uniform_mview, false, ref ob.ModelViewProjectionMatrix);
-                GL.DrawElements(BeginMode.Triangles, ob.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint));
-                indiceat += ob.Indices.Length;
+                GL.UniformMatrix4(shaders[activeShader].GetUniform("modelview"), false, ref v.ModelViewProjectionMatrix);
+                //Debug.WriteLine(v.IsTextured);
+                if (v.IsTextured)
+                {
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, v.Texture.TexID);
+                    if (shaders[activeShader].GetUniform("maintexture") != -1)
+                    {
+                        GL.Uniform1(shaders[activeShader].GetUniform("maintexture"), 0);
+                    }
+                }
+                GL.DrawElements(BeginMode.Triangles, v.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint));
+                indiceat += v.Indices.Length;
             }
 
 
-            GL.DisableVertexAttribArray(attribute_vpos);  // enable vertex vbo
-            GL.DisableVertexAttribArray(attribute_vcol); // enable color vbo
+            shaders[activeShader].DisableVertexAttribArrays();
 
 
             GL.Flush();
@@ -282,18 +293,39 @@ namespace _3D_Tree_Generator
             }
         }
 
-        void loadShader(String filename, ShaderType type, int program, out int address)
+
+        private void SaveAs(object sender, EventArgs e)
         {
-            address = GL.CreateShader(type);
-            using (StreamReader sr = new StreamReader(filename))
-            {
-                GL.ShaderSource(address, sr.ReadToEnd());
-            }
-            GL.CompileShader(address);
-            GL.AttachShader(program, address);
-            Debug.WriteLine("Loading " + type.ToString() + ": " +  filename);
-            Debug.WriteLine(GL.GetShaderInfoLog(address));
-            Debug.WriteLine("Done");
+            SaveFileDialog save = new SaveFileDialog();
+            save.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            save.DefaultExt = ".tre";
+            save.Filter = "Tree files (*.tre)|*.tre|All files (*.*)|*.*";
+            save.FilterIndex = 1;
+            save.ShowDialog();
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            Stream stream = save.OpenFile();
+            formatter.Serialize(stream, tree);
+            stream.Close();
+
+
+            //https://msdn.microsoft.com/en-us/library/ms973893.aspx
+            //https://msdn.microsoft.com/en-us/library/system.windows.forms.savefiledialog.openfile(v=vs.110).aspx
+        }
+
+        private void Open(object sender, EventArgs e)
+        {
+            OpenFileDialog open = new OpenFileDialog();
+            open.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            open.DefaultExt = ".tre";
+            open.Filter = "Tree files (*.tre)|*.tre|All files (*.*)|*.*";
+            open.FilterIndex = 1;
+            open.ShowDialog();
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            Stream stream = open.OpenFile();
+            tree = (Tree) formatter.Deserialize(stream);
+            stream.Close();
+            tree.GenerateTree();
+            update();
         }
 
         //http://barcodebattler.co.uk/tutorials/csgl1.htm

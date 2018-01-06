@@ -13,6 +13,7 @@ using System.Diagnostics;
 
 namespace _3D_Tree_Generator
 {
+    [Serializable]
     class Mesh
     {
         private Vector3 position;
@@ -64,7 +65,30 @@ namespace _3D_Tree_Generator
         public Vector3[] Vertices { get; set; }
         public int[] Indices { get; set; }
         public Vector3[] Normals { get; set; }
-        public List<Vector3> Colors { get; set; }
+        public Vector2[] TexCoords { get; set; }
+        public Texture Texture { get; set; }
+
+        public bool IsTextured = false;
+
+        private Vector3[] colors;
+        public Vector3[] Colors
+        {
+            get
+            {
+                if (colors.Length < Indices.Length)
+                {
+                    return Enumerable.Repeat(new Vector3(1,0,0), Indices.Length).ToArray(); //https://stackoverflow.com/questions/3363940/fill-listint-with-default-values
+                }
+                else
+                {
+                    return colors;
+                }
+            }
+            set
+            {
+                colors = value;
+            }
+        }
 
         private Tri[] tris;
         public Tri[] Tris
@@ -86,11 +110,7 @@ namespace _3D_Tree_Generator
                 }
                 Normals = normals;
 
-                int[] indices = new int[tris.Length * 3];
-                for (int i = 0; i < tris.Length * 3; i++)
-                {
-                    indices[i] = i;
-                }
+                int[] indices = Enumerable.Range(0, Tris.Length * 3).ToArray();
                 Indices = indices;
 
                 Vector3[] vertices = new Vector3[tris.Length * 3];
@@ -102,14 +122,23 @@ namespace _3D_Tree_Generator
                 }
                 Vertices = vertices;
 
-                Vector3[] colors = new Vector3[tris.Length * 3];
+                Vector3[] colours = new Vector3[tris.Length * 3];
                 for (int i = 0; i < tris.Length; i++)
                 {
-                    colors[i * 3] = tris[i].Item1.Color;
-                    colors[i * 3 + 1] = tris[i].Item2.Color;
-                    colors[i * 3 + 2] = tris[i].Item3.Color;
+                    colours[i * 3] = tris[i].Item1.Color;
+                    colours[i * 3 + 1] = tris[i].Item2.Color;
+                    colours[i * 3 + 2] = tris[i].Item3.Color;
                 }
-                Vertices = vertices;
+                Colors = colours;
+
+                Vector2[] texcoords = new Vector2[tris.Length * 3];
+                for (int i = 0; i < tris.Length; i++)
+                {
+                    texcoords[i * 3] = tris[i].Item1.TextureCoord;
+                    texcoords[i * 3 + 1] = tris[i].Item2.TextureCoord;
+                    texcoords[i * 3 + 2] = tris[i].Item3.TextureCoord;
+                }
+                TexCoords = texcoords;
             }
         }
 
@@ -126,7 +155,6 @@ namespace _3D_Tree_Generator
             CalculateModelMatrix();
             ModelMatrix = Matrix4.Identity;
             ModelViewProjectionMatrix = Matrix4.Identity;
-            Colors = new List<Vector3>();
             tris = new Tri[] { new Tri()};
         }
 
@@ -176,25 +204,48 @@ namespace _3D_Tree_Generator
                 newFaces.Add(face);
             }
             Tris = newFaces.ToArray();
-
-            Random rand = new Random();
-            Vector3[] tempcols = new Vector3[Vertices.Length - Colors.Count];
-            for (int i = 0; i < tempcols.Length; i++)
-            {
-                tempcols[i] = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
-            }
-            Colors.AddRange(tempcols);
         }
 
-        
-        /// <summary>
-        /// Generate Mesh from .obj compliant strings. Textures will not be loaded.
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static Mesh MeshFromString(string str)
+        public Mesh(Vector3[] vertices, int[] indices, Vector3[] normals, Vector2[] texs)
         {
-            Debug.WriteLine(str);
+            IsTextured = true;
+
+            List<Tri> newFaces = new List<Tri>();
+            if (normals.Length < vertices.Length)
+            {
+                List<Vector3> temp = new List<Vector3>(normals);
+                temp.AddRange(new Vector3[vertices.Length - normals.Length]);
+                normals = temp.ToArray();
+            }
+            for (int i = 0; i < indices.Length - 2; i += 3)
+            {
+                //Debug.WriteLine("");
+                //Debug.WriteLine(i.ToString());
+                //Debug.WriteLine(vertices.Length.ToString());
+                //Debug.WriteLine(normals.Length.ToString());
+                //Debug.WriteLine(indices[i].ToString());
+                //Debug.WriteLine(indices[i + 1].ToString());
+                //Debug.WriteLine(indices[i + 2].ToString());
+                Tri face = new Tri();
+                face.Item1 = new Vertex(vertices[indices[i]], normals[indices[i]], texs[indices[i]]);
+                face.Item2 = new Vertex(vertices[indices[i + 1]], normals[indices[i + 1]], texs[indices[i + 1]]);
+                face.Item3 = new Vertex(vertices[indices[i + 2]], normals[indices[i + 2]], texs[indices[i + 2]]);
+                newFaces.Add(face);
+            }
+            Tris = newFaces.ToArray();
+
+        }
+
+
+        /// <summary>
+        /// Import .obj into mesh format
+        /// </summary>
+        /// <param name="filename"></param>
+        public Mesh(string filename)
+        {
+            var sr = new StreamReader(filename);
+            string str = sr.ReadToEnd();
+            //Debug.WriteLine(str);
             List<Vector3> verts = new List<Vector3>();
             List<Vector3> norms = new List<Vector3>();
             List<Vector2> texs = new List<Vector2>();
@@ -224,7 +275,7 @@ namespace _3D_Tree_Generator
                         {
                             for (int j = 0; j < 3; j++)
                             {
-                                Debug.WriteLine("Index: " + parts[i+j].ToString());
+                                Debug.WriteLine("Index: " + parts[i + j].ToString());
                                 string[] bits = parts[i + j].Split('/');
                                 if (bits.Length > 2)
                                 {
@@ -232,13 +283,14 @@ namespace _3D_Tree_Generator
                                 }
                                 else if (bits.Length == 2)
                                 {
-                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) -1, 0));
+                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) - 1, 0));
                                 }
                                 else if (bits.Length == 1)
                                 {
                                     Debug.WriteLine(bits[0]);
                                     inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, 0, 0));
                                 }
+                                Debug.WriteLine(inds[inds.Count - 1]);
                             }
                         }
                         break;
@@ -262,45 +314,34 @@ namespace _3D_Tree_Generator
                 }
             }
 
-            Vector3[] orderedNorms = new Vector3[verts.Count];
-            Vector2[] orderedTexs = new Vector2[verts.Count];
-
-            for (int i = 0; i < verts.Count; i++)
+            if (verts.Count == 0)
             {
-                if (inds[i].Item1 < norms.Count)
-                {
-                    orderedNorms[inds[i].Item1] = norms[inds[i].Item2];
-                }
-                if (inds[i].Item1 < texs.Count)
-                {
-                    orderedTexs[inds[i].Item1] = texs[inds[i].Item3];
-                }
-
-            }
-            int[] vertOnlyInds = new int[inds.Count];
-
-            for (int i = 0; i < inds.Count; i++)
-            {
-                vertOnlyInds[i] = inds[i].Item1;
+                verts = new Vector3[] { new Vector3(0, 0, 0) }.ToList();
             }
 
-            Mesh mesh = new Mesh(verts.ToArray(), vertOnlyInds, orderedNorms);
-            mesh.Name = name;
-            return mesh;
-        }
-        
-
-        /// <summary>
-        /// Generate Mesh from .obj files
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
-        public static Mesh MeshFromFile(String filename)
-        {
-            using (StreamReader sr = new StreamReader(filename))
+            if (texs.Count == 0)
             {
-                return MeshFromString(sr.ReadToEnd());
+                texs = new Vector2[] { new Vector2(0, 0) }.ToList();
             }
+
+            if (norms.Count == 0)
+            {
+                norms = new Vector3[] { new Vector3(0, 0, 0) }.ToList();
+            }
+
+            List<Tri> newFaces = new List<Tri>();
+            for (int i = 0; i < inds.Count -3; i += 3)
+            {
+                newFaces.Add(new Tri(
+                    new Vertex(verts[inds[i].Item1], norms[inds[i].Item3], texs[inds[i].Item2], new Vector3(0, 1, 0)),
+                    new Vertex(verts[inds[i+1].Item1], norms[inds[i+1].Item3], texs[inds[i+1].Item2], new Vector3(0, 1, 0)),
+                    new Vertex(verts[inds[i+2].Item1], norms[inds[i+2].Item3], texs[inds[i+2].Item2], new Vector3(0, 1, 0))
+                    ));
+            } 
+
+            Tris = newFaces.ToArray();
+            Name = name;
+            //IsTextured = true;
         }
 
         /// <summary>
@@ -362,17 +403,14 @@ namespace _3D_Tree_Generator
             Vector3 translation = mat.ExtractTranslation();
             //Debug.WriteLine(translation);
             //Debug.WriteLine(new Vector3(mat * new Vector4(new Vector3(0f,1.0f,0f), 1.0f)) + translation);
-            mat = mat.ClearTranslation();
+            //mat = mat.ClearTranslation();
             //Debug.WriteLine(mat);
 
             Tri[] newtris = new Tri[Tris.Length];
             
             for (int i = 0; i < Tris.Length; i++)
             {
-                newtris[i] = new Tri();
-                newtris[i].Item1 = Tris[i].Item1.Transformed(mat, translation);
-                newtris[i].Item2 = Tris[i].Item2.Transformed(mat, translation);
-                newtris[i].Item3 = Tris[i].Item3.Transformed(mat, translation);
+                newtris[i] = Tris[i].Transformed(mat);
             }
 
             Mesh Mesh = new Mesh(newtris);

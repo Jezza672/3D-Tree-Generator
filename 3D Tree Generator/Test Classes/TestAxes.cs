@@ -21,7 +21,8 @@ namespace _3D_Tree_Generator.Test_Classes
 
         }
 
-        public TestAxes(Vector3 pos) : base(new Vector3[] {
+        public TestAxes(Vector3 pos) : base(
+                new Vector3[] {
                 new Vector3(0f, 0.1f,  0.1f),
                 new Vector3(0f, -0.1f,  0.1f),
                 new Vector3(0f, -0.1f,  -0.1f),
@@ -192,9 +193,9 @@ namespace _3D_Tree_Generator.Test_Classes
                 new Vector3(0, 0, 1),
                 new Vector3(0, 0, 1),
 
-            }.ToList();
+            };
 
-            Debug.WriteLine(String.Format("Created Test Cube at {0}", Position.ToString()));
+            Debug.WriteLine(String.Format("Created Test Axis at {0}", Position.ToString()));
         }
     }
 }
