@@ -42,36 +42,6 @@ namespace _3D_Tree_Generator
             IsTextured = false;
         }
 
-        /// <summary>
-        /// unfinished
-        /// </summary>
-        /// <param name="height"></param>
-        /// <param name="radius"></param>
-        /// <param name="matrix"></param>
-        /// <returns></returns>
-        public Mesh GenerateBranch(float height, float radius, Matrix4 matrix, int depth)
-        {
-            float Smallradius = radius - 0.2f;
-            if (Smallradius < MinRadius){
-                Smallradius = MinRadius;
-            }
-            Mesh geometry = CreateFrustum(height, radius, Smallradius, 1, Quality).Transform(matrix);
-
-            if (height < MinHeight) //if the branch is too short, stop generating more extentions
-            {
-                return geometry;
-            }
-
-            Matrix4 newMatrix = matrix * Matrix4.CreateTranslation(new Vector3(0, height, 0)) * Matrix4.CreateRotationZ(Alpha) * matrix.Inverted();
-            geometry += GenerateBranch(height - 0.2f, Smallradius, newMatrix, depth + 1);
-            //if (depth > 2) // make a branch
-            //{
-            //    newMatrix = matrix * Matrix4.CreateTranslation(new Vector3(0, height, 0)) * Matrix4.CreateRotationY(2f) * Matrix4.CreateRotationX(Alpha * 10f);
-            //    geometry += GenerateBranch(height - 0.2f, Smallradius, newMatrix, 0).Transform(newMatrix);
-            //}
-            return geometry;
-        }
-
         public void GenerateTree()
         {
             Random rnd = new Random(Seed);
@@ -98,7 +68,7 @@ namespace _3D_Tree_Generator
             if (rnd.NextDouble() < Branching)
             {
                 Mesh branch = GenerateTree(radius / 1.5f, segmentHeight, rnd, col + 1).Item2;
-                Matrix4 branchMat = Matrix4.CreateRotationX(1) * Matrix4.CreateRotationY((float) (rnd.NextDouble() * Math.PI * 2));
+                Matrix4 branchMat = Matrix4.CreateRotationY((float)(rnd.NextDouble() * Math.PI * 2)) * Matrix4.CreateRotationX(1) * Matrix4.CreateRotationY((float) (rnd.NextDouble()));
                 branchTris =  branch.Tris.Select(x => x.Transformed(branchMat)).ToList();
             }
 
@@ -123,21 +93,87 @@ namespace _3D_Tree_Generator
         }
 
         /// <summary>
+        /// Recursive function for creating a branch.
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="height"></param>
+        /// <param name="segments"></param>
+        /// <param name="quality"></param>
+        /// <param name="color">optional</param>
+        /// <param name="topRadius">optional</param>
+        /// <param name="topColor">optional</param>
+        /// <returns></returns>
+        public static Tri[] GenerateBranch(float radius, float height, int segments, int quality, 
+                                                float color = 0.5f, 
+                                                float topRadius = 0f, 
+                                                float topColor = -1f, 
+                                                bool branch = true,
+                                                float minDist = 1f,
+                                                float flare = 0f,
+                                                float flareEnd = 0f
+                                            )
+        {
+            List<Vertex> verts = new List<Vertex>();
+            List<Tri> tris = new List<Tri>();
+            Matrix4 matrix = Matrix4.CreateScale(1, 1, 1 + flare) * Matrix4.CreateTranslation(0, 0, -flare/2f);
+            verts.AddRange(CreateCrossSection(radius, quality, color).Select(e => e.Transformed(matrix)));
+            float distSinceBranch = 0;
+            for (float i = 1; i < segments + 1; i++)
+            {
+                float currentHeight = i.Map(0f, segments, 0, height);
+                matrix = Matrix4.CreateTranslation(0, currentHeight, 0);
+                if (flare > 0 && currentHeight <= flareEnd)
+                {
+                    float delta = ((float)Math.Sqrt(currentHeight)).Map(0, (float)Math.Sqrt(flareEnd), flare, 0);
+                    matrix = Matrix4.CreateScale(1, 1, 1 + delta) * Matrix4.CreateTranslation(0, 0, -delta/2) * matrix;
+                }
+                float sliceColor = color;
+                if (topColor >= 0)
+                {
+                    sliceColor = i.Map(0f, segments, color, topColor);
+                }
+
+                verts.AddRange(CreateCrossSection(i.Map(0f, segments, radius, topRadius), quality, sliceColor).Select(e => e.Transformed(matrix)));
+
+                int pos = verts.Count - quality;
+                for (int j = 0; j < quality; j++)
+                {
+                    //Debug.WriteLine("VertsCount: " + verts.Count);
+                    //Debug.WriteLine(String.Format("{0}, {1}, {2}", pos + j, pos + (j + 1) % quality, pos + j - quality));
+                    //Debug.WriteLine(String.Format("{0}, {1}, {2}", pos + j - quality, pos + (j + 1) % quality, pos - quality + (j + 1) % quality));
+                    tris.Add(new Tri(verts[pos + j], verts[pos + (j + 1) % quality], verts[pos + j - quality]));
+                    tris.Add(new Tri(verts[pos + j - quality], verts[pos + (j + 1) % quality], verts[pos - quality + (j + 1) % quality]));
+                }
+                distSinceBranch += height / segments;
+                if (distSinceBranch > minDist && branch)
+                {
+                    matrix = Matrix4.CreateRotationY(i) * Matrix4.CreateRotationX(1) * Matrix4.CreateTranslation(0, currentHeight, 0) ;
+                    tris.AddRange(GenerateBranch(i.Map(0f, segments, radius, topRadius)/2f, i.Map(0f, segments, height, 0), 
+                        segments, quality, branch: false, color: 0.2f, topColor: 0.8f, flare: 1f, flareEnd: 2f).Select(e => e.Transformed(matrix)));
+                    distSinceBranch = 0;
+                }
+            }
+            return tris.ToArray();
+
+
+        }
+
+        /// <summary>
         /// Created a regular <paramref name="horizontalSegments"/> sided shape
         /// </summary>
         /// <param name="radius"></param>
         /// <param name="horizontalSegments"></param>
         /// <param name="num"></param>
         /// <returns>array ov vertices</returns>
-        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, int num)
+        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, float color)
         {
             Vertex[] verts = new Vertex[horizontalSegments];
             double theta = 2 * Math.PI / horizontalSegments;
 
             for (int i = 0; i < horizontalSegments; i++)
             {
-                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i)), Vector3.Zero, new Vector3((float)num/100f));
-                Debug.WriteLine(verts[i].ToStringFull());
+                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i)), Vector3.Zero, new Vector3(color));
+                //Debug.WriteLine(verts[i].ToStringFull());
             }
 
             // Debug.WriteLine("tris: " + String.Join(", \n", tris.Select(p => p.ToString()).ToArray()));
@@ -210,6 +246,14 @@ namespace _3D_Tree_Generator
             // Debug.WriteLine("tris: " + String.Join(", \n", tris.Select(p => p.ToString()).ToArray()));
             Mesh mesh = new Mesh(tris);
             return mesh;
+        }
+    }
+
+    public static class ExtensionMethods //https://stackoverflow.com/questions/14353485/how-do-i-map-numbers-in-c-sharp-like-with-map-in-arduino
+    {
+        public static float Map(this float value, float fromSource, float toSource, float fromTarget, float toTarget)
+        {
+            return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
         }
     }
 }

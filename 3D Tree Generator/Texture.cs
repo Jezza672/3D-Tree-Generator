@@ -39,20 +39,37 @@ namespace _3D_Tree_Generator
 
         }
 
-        public Texture(string filename) : this(ConvertToBitmap(filename))
+        public Texture(string filename, bool Alert = true) : this(ConvertToBitmap(filename, Alert))
         {
             Debug.WriteLine(String.Format("Loaded {0} with TexID {1}", filename, TexID));
         }
 
-        public static Bitmap ConvertToBitmap(string fileName) //https://stackoverflow.com/questions/24383256/how-can-i-convert-a-jpg-file-into-a-bitmap-using-c
+        public static Bitmap ConvertToBitmap(string fileName, bool alert = true) //https://stackoverflow.com/questions/24383256/how-can-i-convert-a-jpg-file-into-a-bitmap-using-c
         {
             Bitmap bitmap;
-            using (Stream bmpStream = System.IO.File.Open(fileName, System.IO.FileMode.Open))
+            try
             {
-                Image image = Image.FromStream(bmpStream);
+                using (Stream bmpStream = System.IO.File.Open(fileName, System.IO.FileMode.Open))
+                {
+                    Image image = Image.FromStream(bmpStream);
 
-                bitmap = new Bitmap(image);
+                    bitmap = new Bitmap(image);
 
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                if (alert)
+                {
+                    MessageBox.Show(String.Format("Texture \"{0}\" could not be found", fileName), "Texture Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                using (Stream bmpStream = System.IO.File.Open("Resources/Textures/Default.jpg", System.IO.FileMode.Open))
+                {
+                    Image image = Image.FromStream(bmpStream);
+
+                    bitmap = new Bitmap(image);
+
+                }
             }
             return bitmap;
         }

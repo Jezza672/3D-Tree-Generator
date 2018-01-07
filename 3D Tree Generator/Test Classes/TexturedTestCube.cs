@@ -22,7 +22,7 @@ namespace _3D_Tree_Generator.Test_Classes
         {
             Debug.WriteLine(String.Join("\n", Tris.Select(i => i.ToStringFull()).ToArray()));
             Recalculate();
-            Texture = new Texture("Resources/Textures/TestTexture.jpg");
+            Texture = new Texture("Resources/Textures/Default.jpg", false);
             IsTextured = true;
             Name = "TexturedTestCube";
             Position = new Vector3(0, 0, 0);

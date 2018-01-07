@@ -142,6 +142,9 @@ namespace _3D_Tree_Generator
 
                 Buffers.Add(Uniforms.Values.ElementAt(i).name, buffer);
             }
+            uint indexBuffer;
+            GL.GenBuffers(1, out indexBuffer);
+            Buffers.Add("indices", indexBuffer);
         }
 
         public void EnableVertexAttribArrays()

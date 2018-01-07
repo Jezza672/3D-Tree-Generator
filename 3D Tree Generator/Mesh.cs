@@ -205,7 +205,7 @@ namespace _3D_Tree_Generator
             Tris = newFaces.ToArray();
         }
 
-        public Mesh(Vector3[] vertices, int[] indices, Vector3[] normals, Vector2[] texs)
+        public Mesh(Vector3[] vertices, int[] indices, Vector3[] normals, Vector2[] texs) : this()
         {
             IsTextured = true;
 
@@ -240,7 +240,7 @@ namespace _3D_Tree_Generator
         /// Import .obj into mesh format
         /// </summary>
         /// <param name="filename"></param>
-        public Mesh(string filename)
+        public Mesh(string filename) : this()
         {
             var sr = new StreamReader(filename);
             string str = sr.ReadToEnd();
@@ -269,28 +269,13 @@ namespace _3D_Tree_Generator
                         break;
                     case "f":
                         Debug.Write("Tri: ");
-                        Debug.WriteLine(String.Join(", ", parts.Select(p => p.ToString()).ToArray()));
-                        for (int i = 1; i < parts.Count - 2; i++)
+                        Debug.WriteLine(String.Join(" ", parts.Select(p => p.ToString()).ToArray()));
+                        Debug.WriteLine(parts.Count - 1);
+                        for (int i = 2; i < parts.Count - 1; i+=1)
                         {
-                            for (int j = 0; j < 3; j++)
-                            {
-                                Debug.WriteLine("Index: " + parts[i + j].ToString());
-                                string[] bits = parts[i + j].Split('/');
-                                if (bits.Length > 2)
-                                {
-                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) - 1, int.Parse(bits[2]) - 1));
-                                }
-                                else if (bits.Length == 2)
-                                {
-                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) - 1, 0));
-                                }
-                                else if (bits.Length == 1)
-                                {
-                                    Debug.WriteLine(bits[0]);
-                                    inds.Add(new Tuple<int, int, int>(int.Parse(bits[0]) - 1, 0, 0));
-                                }
-                                Debug.WriteLine(inds[inds.Count - 1]);
-                            }
+                            inds.Add(CreateInd(parts[1]));
+                            inds.Add(CreateInd(parts[i]));
+                            inds.Add(CreateInd(parts[i + 1]));
                         }
                         break;
                     case "vn":
@@ -329,18 +314,36 @@ namespace _3D_Tree_Generator
             }
 
             List<Tri> newFaces = new List<Tri>();
-            for (int i = 0; i < inds.Count -3; i += 3)
+            for (int i = 0; i < inds.Count; i += 3)
             {
                 newFaces.Add(new Tri(
-                    new Vertex(verts[inds[i].Item1], norms[inds[i].Item3], texs[inds[i].Item2], new Vector3(0, 1, 0)),
-                    new Vertex(verts[inds[i+1].Item1], norms[inds[i+1].Item3], texs[inds[i+1].Item2], new Vector3(0, 1, 0)),
-                    new Vertex(verts[inds[i+2].Item1], norms[inds[i+2].Item3], texs[inds[i+2].Item2], new Vector3(0, 1, 0))
+                    new Vertex(verts[inds[i].Item1], norms[inds[i].Item3], texs[inds[i].Item2], new Vector3(0.2f, 0.2f, 0.2f)),
+                    new Vertex(verts[inds[i+1].Item1], norms[inds[i+1].Item3], texs[inds[i+1].Item2], new Vector3(0.2f, 0.2f, 0.2f)),
+                    new Vertex(verts[inds[i+2].Item1], norms[inds[i+2].Item3], texs[inds[i+2].Item2], new Vector3(0.2f, 0.2f, 0.2f))
                     ));
             } 
 
             Tris = newFaces.ToArray();
             Name = name;
             //IsTextured = true;
+        }
+
+        private Tuple<int, int, int> CreateInd(string str)
+        {
+            string[] bits = str.Split('/');
+            if (bits.Length > 2)
+            {
+                return new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) - 1, int.Parse(bits[2]) - 1);
+            }
+            else if (bits.Length == 2)
+            {
+                return new Tuple<int, int, int>(int.Parse(bits[0]) - 1, int.Parse(bits[1]) - 1, 0);
+            }
+            else
+            {
+                //Debug.WriteLine(bits[0]);
+                return new Tuple<int, int, int>(int.Parse(bits[0]) - 1, 0, 0);
+            }
         }
 
         /// <summary>
