@@ -45,51 +45,16 @@ namespace _3D_Tree_Generator
         public void GenerateTree()
         {
             Random rnd = new Random(Seed);
-            Tris = GenerateTree(TrunkRadius, Height / (float)(TrunkRadius/0.02), rnd, 0).Item2.Tris;
-        }
-
-        /// <summary>
-        /// returns the vertices of current slice, and the mesh of the slices after this one
-        /// </summary>
-        /// <param name="radius"></param>
-        /// <param name="segmentHeight"></param>
-        /// <returns></returns>
-        public Tuple<Vertex[], Mesh> GenerateTree(float radius, float segmentHeight, Random rnd, int col)
-        {
-            List<Vertex> verts = new List<Vertex>();
-            verts.AddRange(CreateCrossSection(radius, Quality, col)); //add the current slice
-
-            if (radius < 0.02) //if too small, stop recurtion
-            {
-                return new Tuple<Vertex[], Mesh>(verts.ToArray(), new Mesh());
-            }
-
-            List<Tri> branchTris = new List<Tri>();
-            if (rnd.NextDouble() < Branching)
-            {
-                Mesh branch = GenerateTree(radius / 1.5f, segmentHeight, rnd, col + 1).Item2;
-                Matrix4 branchMat = Matrix4.CreateRotationY((float)(rnd.NextDouble() * Math.PI * 2)) * Matrix4.CreateRotationX(1) * Matrix4.CreateRotationY((float) (rnd.NextDouble()));
-                branchTris =  branch.Tris.Select(x => x.Transformed(branchMat)).ToList();
-            }
-
-            Tuple<Vertex[], Mesh> result = GenerateTree(radius-0.02f, segmentHeight, rnd, col + 1); //get the next bits of the tree.
-                  
-            Matrix4 matrix = Matrix4.CreateTranslation(new Vector3(0, segmentHeight, 0)) * Matrix4.CreateRotationZ(Beta) * Matrix4.CreateRotationY(0.1f); //translation matrix for bits after
-            
-            verts.AddRange(result.Item1.Select(i => i.Transformed(matrix))); //add the new vertices
-
-            Tri[] tris = new Tri[Quality * 2]; //creates the new triangles
-            for (int i = 0; i < Quality; i++)
-            {
-                tris[i] = new Tri(verts[i], verts[(i + 1) % Quality], verts[i + Quality]);
-                tris[i + Quality] = new Tri(verts[(i + 1) % Quality], verts[i + Quality], verts[((i + 1) % Quality) + Quality]);
-            }
-
-            Mesh mesh = result.Item2;
-            mesh = mesh.Transform(matrix);
-            mesh.AddTris(tris);
-            mesh.AddTris(branchTris.ToArray());
-            return new Tuple<Vertex[], Mesh>(verts.Take(Quality).ToArray(), mesh);           //https://stackoverflow.com/questions/943635/getting-a-sub-array-from-an-existing-array
+            Tris = GenerateBranch(
+                TrunkRadius,
+                Height,
+                100,
+                Quality,
+                color: 0.2f,
+                topColor: 0.8f,
+                topRadius: 0.2f,
+                minDist: Branching     
+                );
         }
 
         /// <summary>
@@ -110,30 +75,51 @@ namespace _3D_Tree_Generator
                                                 bool branch = true,
                                                 float minDist = 1f,
                                                 float flare = 0f,
-                                                float flareEnd = 0f
+                                                float flareEnd = 0f,
+                                                Func<double, float> shapeFunction = null,
+                                                Func<double, float> inverseFunction = null
+                                            
                                             )
         {
             List<Vertex> verts = new List<Vertex>();
             List<Tri> tris = new List<Tri>();
-            Matrix4 matrix = Matrix4.CreateScale(1, 1, 1 + flare) * Matrix4.CreateTranslation(0, 0, -flare/2f);
-            verts.AddRange(CreateCrossSection(radius, quality, color).Select(e => e.Transformed(matrix)));
-            float distSinceBranch = 0;
+            //create the bottom ring of vertices
+            verts.AddRange(CreateCrossSection(radius, quality, color, 1 + flare).Select(e => e.Transformed(Matrix4.CreateTranslation(0,0,-radius * (flare)/2f))));
+
+            float distSinceBranch = 0; //so that branches are ot too close to eachother or the base of the branch
+
             for (float i = 1; i < segments + 1; i++)
             {
-                float currentHeight = i.Map(0f, segments, 0, height);
-                matrix = Matrix4.CreateTranslation(0, currentHeight, 0);
+                float currentHeight = i.Lerp(0f, segments, 0, height); //Lerp (Linear interpolation -> see extension methods) to get current height
+                float currentRadius;
+                if (shapeFunction == null)
+                {
+                     currentRadius = i.Lerp(0f, segments, radius, topRadius);
+                    //get currentRadius
+                }
+                else if (inverseFunction == null)
+                {
+                    currentRadius = i.InterpCust(0, segments, radius, topRadius, shapeFunction);
+                }
+                else
+                {
+                    currentRadius = i.CustInterp(0, segments, radius, topRadius, shapeFunction, inverseFunction);
+                }
+                
+                Matrix4 matrix = Matrix4.CreateTranslation(0, currentHeight, 0);
+                float delta = 0;
                 if (flare > 0 && currentHeight <= flareEnd)
                 {
-                    float delta = ((float)Math.Sqrt(currentHeight)).Map(0, (float)Math.Sqrt(flareEnd), flare, 0);
-                    matrix = Matrix4.CreateScale(1, 1, 1 + delta) * Matrix4.CreateTranslation(0, 0, -delta/2) * matrix;
+                    delta = currentHeight.InterpRoot(0, flareEnd, flare, 0);
+                    matrix = matrix * Matrix4.CreateTranslation(0,0, -currentRadius * (delta) / 2f);
                 }
                 float sliceColor = color;
                 if (topColor >= 0)
                 {
-                    sliceColor = i.Map(0f, segments, color, topColor);
+                    sliceColor = i.Lerp(0f, segments, color, topColor);
                 }
 
-                verts.AddRange(CreateCrossSection(i.Map(0f, segments, radius, topRadius), quality, sliceColor).Select(e => e.Transformed(matrix)));
+                verts.AddRange(CreateCrossSection(currentRadius, quality, sliceColor, delta + 1).Select(e => e.Transformed(matrix)));
 
                 int pos = verts.Count - quality;
                 for (int j = 0; j < quality; j++)
@@ -148,8 +134,8 @@ namespace _3D_Tree_Generator
                 if (distSinceBranch > minDist && branch)
                 {
                     matrix = Matrix4.CreateRotationY(i) * Matrix4.CreateRotationX(1) * Matrix4.CreateTranslation(0, currentHeight, 0) ;
-                    tris.AddRange(GenerateBranch(i.Map(0f, segments, radius, topRadius)/2f, i.Map(0f, segments, height, 0), 
-                        segments, quality, branch: false, color: 0.2f, topColor: 0.8f, flare: 1f, flareEnd: 2f).Select(e => e.Transformed(matrix)));
+                    tris.AddRange(GenerateBranch(currentRadius/2f, i.Lerp(0f, segments, height, 0), 
+                        segments, quality, branch: false, color: 0.2f, topColor: 0.8f, shapeFunction: shapeFunction, flare: 1f, flareEnd: i.Lerp(0f, segments, height, 0)/3f).Select(e => e.Transformed(matrix)));
                     distSinceBranch = 0;
                 }
             }
@@ -165,14 +151,14 @@ namespace _3D_Tree_Generator
         /// <param name="horizontalSegments"></param>
         /// <param name="num"></param>
         /// <returns>array ov vertices</returns>
-        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, float color)
+        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, float color, float zScale = 1)
         {
             Vertex[] verts = new Vertex[horizontalSegments];
             double theta = 2 * Math.PI / horizontalSegments;
 
             for (int i = 0; i < horizontalSegments; i++)
             {
-                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i)), Vector3.Zero, new Vector3(color));
+                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i) * zScale), Vector3.Zero, new Vector3(color));
                 //Debug.WriteLine(verts[i].ToStringFull());
             }
 
@@ -249,11 +235,5 @@ namespace _3D_Tree_Generator
         }
     }
 
-    public static class ExtensionMethods //https://stackoverflow.com/questions/14353485/how-do-i-map-numbers-in-c-sharp-like-with-map-in-arduino
-    {
-        public static float Map(this float value, float fromSource, float toSource, float fromTarget, float toTarget)
-        {
-            return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
-        }
-    }
+
 }
