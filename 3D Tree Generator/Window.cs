@@ -74,6 +74,11 @@ namespace _3D_Tree_Generator
             glControl1_Paint(glControl1, EventArgs.Empty);
         }
 
+        public float function(double x)
+        {
+            return (float)( Math.Pow(x, 6));
+        }
+
         /// <summary>
         /// GlControl Loaded in
         /// </summary>
@@ -82,22 +87,22 @@ namespace _3D_Tree_Generator
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
-            tree.GenerateTree();
-            objects.Add(tree);
+            //tree.GenerateTree();
+            //objects.Add(tree);
 
-            //Mesh mesh = new Mesh(Tree.GenerateBranch(1f, 10f, 10, 7, color: 0.2f, topColor: 0.8f));
+            Mesh mesh = new Mesh(Tree.GenerateBranch(1f, 10f, 10, 7, color: 0.2f, topColor: 0.8f, shapeFunction: function, minDist: 0.1f));
             
             
             //Mesh mesh = new Mesh(Tree.GenerateBranch(5f, 10f, 10, 7, color: 0.2f,  topColor: 0.8f, branch: false, flare: 1, flareEnd: 2f));
 
             //mesh.Rotation = new Vector3((float)Math.PI, 0, 0);
-            //objects.Add(mesh);
+            objects.Add(mesh);
 
             //objects.Add(new TestCube());
             //objects.Add(new TexturedTestCube());
             //objects.Add(new Mesh("Resources/Objects/Car.obj"));
 
-            //objects.Add(new TestAxes());
+            objects.Add(new TestAxes());
             
             
             Debug.WriteLine("Objects: \n" + String.Join("\n", objects));

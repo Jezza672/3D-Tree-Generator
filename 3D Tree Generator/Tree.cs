@@ -158,7 +158,7 @@ namespace _3D_Tree_Generator
 
             for (int i = 0; i < horizontalSegments; i++)
             {
-                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i) * zScale), Vector3.Zero, new Vector3(color));
+                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i) * zScale), Vector3.Zero, new Vector3((float)139/160 * color, (float)69 /160 * color, (float)19 /160 * color));
                 //Debug.WriteLine(verts[i].ToStringFull());
             }
 
