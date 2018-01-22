@@ -39,7 +39,8 @@ namespace _3D_Tree_Generator
             Position = position;
             Normal = new Vector3(0, 0, 0);
             TextureCoord = new Vector2(0, 0);
-            Color = new Vector3(0, 0, 0);
+            Random random = new Random();
+            Color = new Vector3(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255));
         }
 
 

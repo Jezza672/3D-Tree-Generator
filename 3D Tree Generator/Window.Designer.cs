@@ -65,9 +65,6 @@ namespace _3D_Tree_Generator
             this.loadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.guideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Noise = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.Branching = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.TreeHeight = new System.Windows.Forms.NumericUpDown();
@@ -77,18 +74,32 @@ namespace _3D_Tree_Generator
             this.Trunk_Thickness = new System.Windows.Forms.NumericUpDown();
             this.Seed = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
-            this.Curve = new System.Windows.Forms.NumericUpDown();
-            this.label7 = new System.Windows.Forms.Label();
             this.RefreshButton = new System.Windows.Forms.Button();
+            this.TrunkFunction = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
+            this.BranchFunction = new System.Windows.Forms.TextBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.label10 = new System.Windows.Forms.Label();
+            this.Segments = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.label2 = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Noise)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Branching)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TreeHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Quality)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Trunk_Thickness)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Seed)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Curve)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Segments)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.SuspendLayout();
             // 
             // glControl1
@@ -336,61 +347,18 @@ namespace _3D_Tree_Generator
             this.guideToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
             this.guideToolStripMenuItem.Text = "Guide";
             // 
-            // Noise
-            // 
-            this.Noise.AccessibleName = "Noise";
-            this.Noise.DecimalPlaces = 2;
-            this.Noise.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.Noise.Location = new System.Drawing.Point(955, 98);
-            this.Noise.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.Noise.Name = "Noise";
-            this.Noise.Size = new System.Drawing.Size(43, 20);
-            this.Noise.TabIndex = 2;
-            this.Noise.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.Noise.ValueChanged += new System.EventHandler(this.ValueChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(914, 100);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(34, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Noise";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(893, 129);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(55, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Branching";
-            // 
             // Branching
             // 
-            this.Branching.AccessibleName = "Branching";
+            this.Branching.AccessibleName = "MaxDist";
             this.Branching.DecimalPlaces = 2;
             this.Branching.Increment = new decimal(new int[] {
             1,
             0,
             0,
             65536});
-            this.Branching.Location = new System.Drawing.Point(955, 127);
+            this.Branching.Location = new System.Drawing.Point(172, 16);
             this.Branching.Maximum = new decimal(new int[] {
-            1,
+            10,
             0,
             0,
             0});
@@ -401,13 +369,13 @@ namespace _3D_Tree_Generator
             1,
             0,
             0,
-            65536});
+            0});
             this.Branching.ValueChanged += new System.EventHandler(this.ValueChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(910, 159);
+            this.label3.Location = new System.Drawing.Point(1153, 145);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(38, 13);
             this.label3.TabIndex = 7;
@@ -417,7 +385,7 @@ namespace _3D_Tree_Generator
             // 
             this.TreeHeight.AccessibleName = "Height";
             this.TreeHeight.DecimalPlaces = 1;
-            this.TreeHeight.Location = new System.Drawing.Point(955, 157);
+            this.TreeHeight.Location = new System.Drawing.Point(1198, 143);
             this.TreeHeight.Name = "TreeHeight";
             this.TreeHeight.Size = new System.Drawing.Size(43, 20);
             this.TreeHeight.TabIndex = 6;
@@ -431,21 +399,21 @@ namespace _3D_Tree_Generator
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(910, 185);
+            this.label4.Location = new System.Drawing.Point(1087, 171);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(39, 13);
+            this.label4.Size = new System.Drawing.Size(104, 13);
             this.label4.TabIndex = 9;
-            this.label4.Text = "Quality";
+            this.label4.Text = "Horizontal Segments";
             // 
             // Quality
             // 
             this.Quality.AccessibleName = "Quality";
-            this.Quality.Location = new System.Drawing.Point(955, 183);
+            this.Quality.Location = new System.Drawing.Point(1198, 169);
             this.Quality.Name = "Quality";
             this.Quality.Size = new System.Drawing.Size(43, 20);
             this.Quality.TabIndex = 8;
             this.Quality.Value = new decimal(new int[] {
-            3,
+            8,
             0,
             0,
             0});
@@ -454,7 +422,7 @@ namespace _3D_Tree_Generator
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(862, 211);
+            this.label5.Location = new System.Drawing.Point(1104, 223);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(87, 13);
             this.label5.TabIndex = 11;
@@ -469,7 +437,7 @@ namespace _3D_Tree_Generator
             0,
             0,
             65536});
-            this.Trunk_Thickness.Location = new System.Drawing.Point(955, 209);
+            this.Trunk_Thickness.Location = new System.Drawing.Point(1198, 221);
             this.Trunk_Thickness.Name = "Trunk_Thickness";
             this.Trunk_Thickness.Size = new System.Drawing.Size(43, 20);
             this.Trunk_Thickness.TabIndex = 10;
@@ -483,7 +451,7 @@ namespace _3D_Tree_Generator
             // Seed
             // 
             this.Seed.AccessibleName = "Seed";
-            this.Seed.Location = new System.Drawing.Point(917, 51);
+            this.Seed.Location = new System.Drawing.Point(1156, 69);
             this.Seed.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -497,41 +465,11 @@ namespace _3D_Tree_Generator
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(877, 53);
+            this.label6.Location = new System.Drawing.Point(1116, 71);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(32, 13);
             this.label6.TabIndex = 13;
             this.label6.Text = "Seed";
-            // 
-            // Curve
-            // 
-            this.Curve.AccessibleName = "Beta";
-            this.Curve.DecimalPlaces = 2;
-            this.Curve.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.Curve.Location = new System.Drawing.Point(955, 235);
-            this.Curve.Name = "Curve";
-            this.Curve.Size = new System.Drawing.Size(43, 20);
-            this.Curve.TabIndex = 14;
-            this.Curve.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.Curve.ValueChanged += new System.EventHandler(this.ValueChanged);
-            // 
-            // label7
-            // 
-            this.label7.AccessibleName = "";
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(914, 237);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(35, 13);
-            this.label7.TabIndex = 15;
-            this.label7.Text = "Curve";
             // 
             // RefreshButton
             // 
@@ -545,14 +483,194 @@ namespace _3D_Tree_Generator
             this.RefreshButton.UseVisualStyleBackColor = true;
             this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
             // 
+            // TrunkFunction
+            // 
+            this.TrunkFunction.AccessibleName = "TrunkFunction";
+            this.TrunkFunction.Location = new System.Drawing.Point(978, 506);
+            this.TrunkFunction.Name = "TrunkFunction";
+            this.TrunkFunction.Size = new System.Drawing.Size(194, 20);
+            this.TrunkFunction.TabIndex = 17;
+            this.TrunkFunction.Text = "x";
+            // 
+            // label8
+            // 
+            this.label8.AccessibleName = "";
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(893, 509);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(79, 13);
+            this.label8.TabIndex = 18;
+            this.label8.Text = "Trunk Function";
+            // 
+            // button1
+            // 
+            this.button1.AccessibleName = "TrunkFunction";
+            this.button1.Location = new System.Drawing.Point(1178, 506);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(59, 20);
+            this.button1.TabIndex = 19;
+            this.button1.Text = "Update";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Function_Update);
+            // 
+            // label9
+            // 
+            this.label9.AccessibleName = "";
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(887, 535);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(85, 13);
+            this.label9.TabIndex = 21;
+            this.label9.Text = "Branch Function";
+            // 
+            // BranchFunction
+            // 
+            this.BranchFunction.AccessibleName = "BranchFunction";
+            this.BranchFunction.Location = new System.Drawing.Point(978, 532);
+            this.BranchFunction.Name = "BranchFunction";
+            this.BranchFunction.Size = new System.Drawing.Size(194, 20);
+            this.BranchFunction.TabIndex = 20;
+            this.BranchFunction.Text = "x";
+            // 
+            // button2
+            // 
+            this.button2.AccessibleName = "BranchFunction";
+            this.button2.Location = new System.Drawing.Point(1178, 532);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(59, 20);
+            this.button2.TabIndex = 22;
+            this.button2.Text = "Update";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.Function_Update);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(1099, 197);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(92, 13);
+            this.label10.TabIndex = 24;
+            this.label10.Text = "Vertical Segments";
+            // 
+            // Segments
+            // 
+            this.Segments.AccessibleName = "Segments";
+            this.Segments.Location = new System.Drawing.Point(1198, 195);
+            this.Segments.Name = "Segments";
+            this.Segments.Size = new System.Drawing.Size(43, 20);
+            this.Segments.TabIndex = 23;
+            this.Segments.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.Segments.ValueChanged += new System.EventHandler(this.ValueChanged);
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.AccessibleName = "MinDist";
+            this.numericUpDown1.DecimalPlaces = 2;
+            this.numericUpDown1.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numericUpDown1.Location = new System.Drawing.Point(66, 16);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(43, 20);
+            this.numericUpDown1.TabIndex = 25;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 18);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(48, 13);
+            this.label1.TabIndex = 26;
+            this.label1.Text = "Minimum";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(114, 18);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(51, 13);
+            this.label11.TabIndex = 27;
+            this.label11.Text = "Maximum";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label11);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.numericUpDown1);
+            this.groupBox1.Controls.Add(this.Branching);
+            this.groupBox1.Location = new System.Drawing.Point(1014, 95);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(223, 47);
+            this.groupBox1.TabIndex = 28;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Branch Distance";
+            // 
+            // numericUpDown2
+            // 
+            this.numericUpDown2.AccessibleName = "Depth";
+            this.numericUpDown2.Location = new System.Drawing.Point(1198, 247);
+            this.numericUpDown2.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Name = "numericUpDown2";
+            this.numericUpDown2.Size = new System.Drawing.Size(43, 20);
+            this.numericUpDown2.TabIndex = 29;
+            this.numericUpDown2.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.numericUpDown2.ValueChanged += new System.EventHandler(this.ValueChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(1116, 249);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(73, 13);
+            this.label2.TabIndex = 30;
+            this.label2.Text = "Branch Depth";
+            // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.numericUpDown2);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.Segments);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.BranchFunction);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.TrunkFunction);
             this.Controls.Add(this.RefreshButton);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.Curve);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.Seed);
             this.Controls.Add(this.label5);
@@ -561,10 +679,6 @@ namespace _3D_Tree_Generator
             this.Controls.Add(this.Quality);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.TreeHeight);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.Branching);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.Noise);
             this.Controls.Add(this.glControl1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -574,13 +688,16 @@ namespace _3D_Tree_Generator
             this.contextMenuStrip1.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Noise)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Branching)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TreeHeight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Quality)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Trunk_Thickness)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Seed)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Curve)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Segments)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -606,9 +723,6 @@ namespace _3D_Tree_Generator
         private System.Windows.Forms.ToolStripMenuItem leafToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem environmentToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
-        private System.Windows.Forms.NumericUpDown Noise;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown Branching;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown TreeHeight;
@@ -631,10 +745,22 @@ namespace _3D_Tree_Generator
         private NumericUpDown Trunk_Thickness;
         private NumericUpDown Seed;
         private Label label6;
-        private NumericUpDown Curve;
-        private Label label7;
         private ToolStripMenuItem autoRefreshToolStripMenuItem;
         private Button RefreshButton;
+        private TextBox TrunkFunction;
+        private Label label8;
+        private Button button1;
+        private Label label9;
+        private TextBox BranchFunction;
+        private Button button2;
+        private Label label10;
+        private NumericUpDown Segments;
+        private NumericUpDown numericUpDown1;
+        private Label label1;
+        private Label label11;
+        private GroupBox groupBox1;
+        private NumericUpDown numericUpDown2;
+        private Label label2;
     }
 }
 

@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using _3D_Tree_Generator.Test_Classes;
+using NCalc;
 
 
 /* TODO:
@@ -87,32 +88,30 @@ namespace _3D_Tree_Generator
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
 
-            //tree.GenerateTree();
-            //objects.Add(tree);
+            tree.GenerateTree();
+            objects.Add(tree);
 
-            Mesh mesh = new Mesh(Tree.GenerateBranch(1f, 10f, 10, 7, color: 0.2f, topColor: 0.8f, shapeFunction: function, minDist: 0.1f));
+            //Expression exp = new Expression("x*x", EvaluateOptions.IgnoreCase);
+            //Debug.WriteLine(exp.Eval(10));
+
+            //Mesh mesh = new Mesh(Tree.GenerateBranch(1f, 10f, 10, 7, color: 0.2f, topColor: 0.8f, minDist: 1f, trunkFunction: exp));
             
             
             //Mesh mesh = new Mesh(Tree.GenerateBranch(5f, 10f, 10, 7, color: 0.2f,  topColor: 0.8f, branch: false, flare: 1, flareEnd: 2f));
 
             //mesh.Rotation = new Vector3((float)Math.PI, 0, 0);
-            objects.Add(mesh);
+            //objects.Add(mesh);
 
             //objects.Add(new TestCube());
             //objects.Add(new TexturedTestCube());
             //objects.Add(new Mesh("Resources/Objects/Car.obj"));
 
-            objects.Add(new TestAxes());
+            //objects.Add(new TestAxes());
             
             
             Debug.WriteLine("Objects: \n" + String.Join("\n", objects));
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(1.3f, glControl1.Width / (float)glControl1.Height, 0.5f, 100.0f);
-
-            //glControl1.KeyDown += new KeyEventHandler(glControl1_KeyDown);  //https://github.com/andykorth/opentk/blob/master/Source/Examples/OpenTK/GLControl/GLControlGameLoop.cs
-            //glControl1.KeyUp += new KeyEventHandler(glControl1_KeyUp);
-            //glControl1.Resize += new EventHandler(glControl1_Resize);
-            //glControl1.Paint += new PaintEventHandler(glControl1_Paint);
 
             initProgram(); // initialise shaders and VBOs
             GL.ClearColor(Color.White);
@@ -146,7 +145,9 @@ namespace _3D_Tree_Generator
         /// </summary>
         private void update()
         {
-            time += timer.Interval;
+            int interval = timer.Interval;
+            time += interval;
+            //Debug.WriteLine(1000 / interval);
 
             //get data
             List<Vector3> verts = new List<Vector3>(); // create lists for adding all data from every object
@@ -316,6 +317,37 @@ namespace _3D_Tree_Generator
                 {
                     tree.GenerateTree();
                     update();
+                }
+            }
+        }
+
+        private void Function_Update(object sender, EventArgs e)
+        {
+            TextBox box = this.Controls[(sender as Control).AccessibleName] as TextBox;
+            if (box.Text == "")
+            {
+                box.Text = " ";
+            }
+            Expression ex = new Expression(box.Text, EvaluateOptions.IgnoreCase);
+            if (ex.HasErrors())
+            {
+                MessageBox.Show(ex.Error, "Invalid Function", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); //https://stackoverflow.com/questions/3803630/how-to-call-window-alertmessage-from-c
+            }
+            else
+            {
+                try
+                {
+                    var property = tree.GetType().GetProperty(box.AccessibleName);  //https://stackoverflow.com/questions/737151/how-to-get-the-list-of-properties-of-a-class
+                    property.SetValue(tree, Convert.ChangeType(ex, property.PropertyType));
+                    if (this.autoRefreshToolStripMenuItem.Checked)
+                    {
+                        tree.GenerateTree();
+                        update();
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    MessageBox.Show("Must be a function in x!", "Invalid Function", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); //https://stackoverflow.com/questions/3803630/how-to-call-window-alertmessage-from-c
                 }
             }
         }

@@ -11,6 +11,7 @@ using OpenTK;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 
 namespace _3D_Tree_Generator
@@ -48,7 +49,9 @@ namespace _3D_Tree_Generator
 
         public void Rotate(Vector3 rotation)
         {
+            Position = Position - LookingAt;
             Position =  new Vector3(Matrix4.CreateRotationX(rotation.X) * Matrix4.CreateRotationY(rotation.Y) * Matrix4.CreateRotationZ(rotation.Z) * new Vector4(Position, 1));
+            Position = Position + LookingAt;
         }
 
         public void Rotate(float x, float y, float z)
@@ -79,12 +82,11 @@ namespace _3D_Tree_Generator
             switch (Control.MouseButtons)
             {
                 case MouseButtons.Left:
-                    ;
-                    if (nue)
+                    if (nue) //do this if this is the start of the click
                     {
                         prevmouspos = mousepos;
                         nue = false;
-                    }
+                    } //this happens nomatter if just pressed of dragging.
                     Rotate((mousepos.Y - prevmouspos.Y) * Sensitivity, (mousepos.X - prevmouspos.X) * Sensitivity, 0);
                     prevmouspos = mousepos;
                     break;
@@ -112,13 +114,22 @@ namespace _3D_Tree_Generator
 
         public void Zoom(Control control, MouseEventArgs e)
         {
-            if (!control.ClientRectangle.Contains(control.PointToClient(Control.MousePosition)))
+            if (!control.ClientRectangle.Contains(control.PointToClient(Control.MousePosition))) //ensures mouse is inside the preview pane
             {
                 return;
             }
-            Position = Position - LookingAt;
-            Position = Position * (1- Sensitivity * e.Delta * 0.1f);
-            Position = Position + LookingAt;
+            if (Control.ModifierKeys.HasFlag(Keys.Shift)) //tests if shift is pressed
+            {
+                //Debug.WriteLine("control pressed");
+                Position += new Vector3(0, 1, 0) * Sensitivity * e.Delta * 0.3f;
+                LookingAt += new Vector3(0, 1, 0) * Sensitivity * e.Delta * 0.3f;
+            }
+            else
+            {
+                Position = Position - LookingAt;
+                Position = Position * (1 - Sensitivity * e.Delta * 0.1f);
+                Position = Position + LookingAt;
+            }
         }
     }
 }

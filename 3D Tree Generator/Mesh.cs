@@ -316,10 +316,11 @@ namespace _3D_Tree_Generator
             List<Tri> newFaces = new List<Tri>();
             for (int i = 0; i < inds.Count; i += 3)
             {
-                newFaces.Add(new Tri(
-                    new Vertex(verts[inds[i].Item1], norms[inds[i].Item3], texs[inds[i].Item2], new Vector3(0.2f, 0.2f, 0.2f)),
-                    new Vertex(verts[inds[i+1].Item1], norms[inds[i+1].Item3], texs[inds[i+1].Item2], new Vector3(0.2f, 0.2f, 0.2f)),
-                    new Vertex(verts[inds[i+2].Item1], norms[inds[i+2].Item3], texs[inds[i+2].Item2], new Vector3(0.2f, 0.2f, 0.2f))
+                Vector3 color = new Vector3(0.2f, 0.2f, 0.2f);
+                newFaces.Add(new Tri(                        
+                    new Vertex(verts[inds[i].Item1], norms[inds[i].Item3], texs[inds[i].Item2], color),
+                    new Vertex(verts[inds[i+1].Item1], norms[inds[i+1].Item3], texs[inds[i+1].Item2], color),
+                    new Vertex(verts[inds[i+2].Item1], norms[inds[i+2].Item3], texs[inds[i+2].Item2], color)
                     ));
             } 
 

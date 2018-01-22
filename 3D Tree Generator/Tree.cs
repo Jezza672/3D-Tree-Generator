@@ -10,36 +10,42 @@ using OpenTK.Graphics;
 using OpenTK;
 using System.Drawing;
 using System.Diagnostics;
+using NCalc;
 
 namespace _3D_Tree_Generator
 {
     [Serializable]
     class Tree : Mesh
     {
-        public float Height {get; set;}
+        public float Height { get; set; }
         public float TrunkRadius { get; set; }
-        public float Noise{get; set;}
-        public float Branching {get; set;}
+        public float Noise { get; set; }
+        public float MinDist { get; set; }
+        public float MaxDist { get; set; }
         public int Seed { get; set; }
         public float MinHeight { get; set; }
         public float MinRadius { get; set; }
         public int Quality { get; set; }
-        public float Alpha { get; set; }
-        public float Beta { get; set; }
+        public int Segments { get; set; }
+        public int Depth { get; set; }
+        public Expression TrunkFunction { get; set; }
+        public Expression BranchFunction { get; set; }
 
         public Tree(float height, float radius, Matrix4 position)
         {
             Height = height;
             TrunkRadius = radius;
-            Noise = 0;
-            Branching = 0.1f;
+            MinDist = 1f;
+            MaxDist = 2f;
             Seed = 100;
-            Quality = 3;
+            Quality = 8;
+            Segments = 20;
             MinHeight = 0.1f;
             MinRadius = 0.1f;
-            Alpha = 0.1f;
-            Beta = 0.05f;
+            Depth = 2;
             IsTextured = false;
+            TrunkFunction = new Expression("x");
+            BranchFunction = new Expression("x");
         }
 
         public void GenerateTree()
@@ -48,12 +54,17 @@ namespace _3D_Tree_Generator
             Tris = GenerateBranch(
                 TrunkRadius,
                 Height,
-                100,
+                Segments,
                 Quality,
                 color: 0.2f,
                 topColor: 0.8f,
                 topRadius: 0.2f,
-                minDist: Branching     
+                depth: Depth,
+                minDist: MinDist,
+                maxDist: MaxDist,
+                trunkFunction: TrunkFunction,
+                branchFunction: BranchFunction,
+                rnd: rnd
                 );
         }
 
@@ -68,61 +79,64 @@ namespace _3D_Tree_Generator
         /// <param name="topRadius">optional</param>
         /// <param name="topColor">optional</param>
         /// <returns></returns>
-        public static Tri[] GenerateBranch(float radius, float height, int segments, int quality, 
-                                                float color = 0.5f, 
-                                                float topRadius = 0f, 
-                                                float topColor = -1f, 
-                                                bool branch = true,
+        public static Tri[] GenerateBranch(float radius, float height, int segments, int quality,
+                                                float color = 0.5f,
+                                                float topRadius = 0f,
+                                                float topColor = -1f,
+                                                int depth = 1,
                                                 float minDist = 1f,
+                                                float maxDist = 2f,
                                                 float flare = 0f,
                                                 float flareEnd = 0f,
-                                                Func<double, float> shapeFunction = null,
-                                                Func<double, float> inverseFunction = null
-                                            
+                                                Expression trunkFunction = null,
+                                                Expression branchFunction = null,
+                                                Random rnd = null
                                             )
         {
+            if (rnd == null)
+            {
+                rnd = new Random((int)System.DateTime.Now.ToBinary());
+            }
             List<Vertex> verts = new List<Vertex>();
             List<Tri> tris = new List<Tri>();
             //create the bottom ring of vertices
-            verts.AddRange(CreateCrossSection(radius, quality, color, 1 + flare).Select(e => e.Transformed(Matrix4.CreateTranslation(0,0,-radius * (flare)/2f))));
+            verts.AddRange(CreateCrossSection(radius, quality, color, 1 + flare).Select(e => e.Transformed(Matrix4.CreateTranslation(0, 0, -radius * (flare) / 2f))));
 
             float distSinceBranch = 0; //so that branches are ot too close to eachother or the base of the branch
-
+            double Y = rnd.Range(0, 1.5);
             for (float i = 1; i < segments + 1; i++)
             {
                 float currentHeight = i.Lerp(0f, segments, 0, height); //Lerp (Linear interpolation -> see extension methods) to get current height
                 float currentRadius;
-                if (shapeFunction == null)
+                if (trunkFunction == null) // linear interpolate for radius if no trunk function is defined
                 {
-                     currentRadius = i.Lerp(0f, segments, radius, topRadius);
+                    currentRadius = i.Lerp(0f, segments, radius, topRadius);
                     //get currentRadius
                 }
-                else if (inverseFunction == null)
+                else //if there is a trunk function, use that
                 {
-                    currentRadius = i.InterpCust(0, segments, radius, topRadius, shapeFunction);
+                    currentRadius = i.CustInterp(0, segments, radius, topRadius, trunkFunction);
                 }
-                else
-                {
-                    currentRadius = i.CustInterp(0, segments, radius, topRadius, shapeFunction, inverseFunction);
-                }
-                
-                Matrix4 matrix = Matrix4.CreateTranslation(0, currentHeight, 0);
+
+                Matrix4 matrix = Matrix4.CreateTranslation(0, currentHeight, 0); //define the translation to move the vertices generated to the current slice
                 float delta = 0;
-                if (flare > 0 && currentHeight <= flareEnd)
+                if (flare > 0 && currentHeight <= flareEnd) //if part of the flare, cause flaring
                 {
                     delta = currentHeight.InterpRoot(0, flareEnd, flare, 0);
-                    matrix = matrix * Matrix4.CreateTranslation(0,0, -currentRadius * (delta) / 2f);
+                    matrix = matrix * Matrix4.CreateTranslation(0, 0, -currentRadius * (delta) / 2f);
                 }
                 float sliceColor = color;
                 if (topColor >= 0)
                 {
-                    sliceColor = i.Lerp(0f, segments, color, topColor);
+                    sliceColor = i.Lerp(0f, segments, color, topColor); //set color for current slice, if a gradient is wanted
                 }
 
+
+                //generate and add vertices to the vertex array, but apply the previously mentioned tranformations first
                 verts.AddRange(CreateCrossSection(currentRadius, quality, sliceColor, delta + 1).Select(e => e.Transformed(matrix)));
 
                 int pos = verts.Count - quality;
-                for (int j = 0; j < quality; j++)
+                for (int j = 0; j < quality; j++) //this creates the triangles needed to join the previous slice with the current one
                 {
                     //Debug.WriteLine("VertsCount: " + verts.Count);
                     //Debug.WriteLine(String.Format("{0}, {1}, {2}", pos + j, pos + (j + 1) % quality, pos + j - quality));
@@ -131,21 +145,28 @@ namespace _3D_Tree_Generator
                     tris.Add(new Tri(verts[pos + j - quality], verts[pos + (j + 1) % quality], verts[pos - quality + (j + 1) % quality]));
                 }
                 distSinceBranch += height / segments;
-                if (distSinceBranch > minDist && branch)
+                //make the minimum distance be a random number between two decreasing values as you near the end of the branch
+                double minimumDistance = rnd.Range(i.Lerp(0, segments, minDist * 2, minDist), i.Lerp(0, segments, maxDist, maxDist/2));
+                if (distSinceBranch > minimumDistance && Convert.ToBoolean(depth)) //if we are past the minimum distance since the previous branch, create a new one
                 {
-                    matrix = Matrix4.CreateRotationY(i) * Matrix4.CreateRotationX(1) * Matrix4.CreateTranslation(0, currentHeight, 0) ;
-                    tris.AddRange(GenerateBranch(currentRadius/2f, i.Lerp(0f, segments, height, 0), 
-                        segments, quality, branch: false, color: 0.2f, topColor: 0.8f, shapeFunction: shapeFunction, flare: 1f, flareEnd: i.Lerp(0f, segments, height, 0)/3f).Select(e => e.Transformed(matrix)));
+                    
+                    matrix = Matrix4.CreateRotationY(currentHeight.CustInterp(0, height * (rnd.Range(0.9, 1.1)), 0, Math.PI * rnd.Range(10, 20), x => (float)(x*x))) * Matrix4.CreateRotationX(1) * Matrix4.CreateTranslation(0, currentHeight, 0);
+                    Y += rnd.Range(i.Lerp(0, segments, 0.7, 0.2), i.Lerp(0, segments, 1.5, 0.5));
+                    Expression function = trunkFunction;
+                    if (branchFunction != null) //if there is a branch function specified, use that for branches else use the trunk function
+                    {
+                        function = branchFunction;
+                    }
+                    tris.AddRange(GenerateBranch(currentRadius / 2f, i.Lerp(0f, segments, height, 0) * (float)rnd.Range(0.8, 1.2),
+                        segments, quality, depth: depth-1, color: 0.2f, topColor: 0.8f, trunkFunction: function, flare: 1f, flareEnd: i.Lerp(0f, segments, height, 0) / 3f).Select(e => e.Transformed(matrix)));
                     distSinceBranch = 0;
                 }
             }
             return tris.ToArray();
-
-
         }
 
         /// <summary>
-        /// Created a regular <paramref name="horizontalSegments"/> sided shape
+        /// Creates a regular <paramref name="horizontalSegments"/> sided shape
         /// </summary>
         /// <param name="radius"></param>
         /// <param name="horizontalSegments"></param>
@@ -158,82 +179,12 @@ namespace _3D_Tree_Generator
 
             for (int i = 0; i < horizontalSegments; i++)
             {
-                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i) * zScale), Vector3.Zero, new Vector3((float)139/160 * color, (float)69 /160 * color, (float)19 /160 * color));
+                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i) * zScale), Vector3.Zero, new Vector3((float)139 / 160 * color, (float)69 / 160 * color, (float)19 / 160 * color));
                 //Debug.WriteLine(verts[i].ToStringFull());
             }
 
             // Debug.WriteLine("tris: " + String.Join(", \n", tris.Select(p => p.ToString()).ToArray()));
             return verts;
         }
-
-        /// <summary>
-        /// Depreciated
-        /// </summary>
-        /// <param name="length"></param>
-        /// <param name="radiusBottom"></param>
-        /// <param name="radiusTop"></param>
-        /// <param name="verticalSegments"></param>
-        /// <param name="horizontalSegments"></param>
-        /// <param name="matrix">Global position and rotation of the frustum</param>
-        /// <returns></returns>
-        public static Mesh CreateFrustum(float length, float radiusBottom, float radiusTop, int verticalSegments, int horizontalSegments)
-        {
-            Tri[] tris = new Tri[verticalSegments * horizontalSegments * 2];
-
-            //Vector3 brown = new Vector3(139f / 255f, 69f / 255f, 19f / 255f);
-
-            double theta = 2 * Math.PI / horizontalSegments;
-
-            float segmentLength = (float)length / (float)verticalSegments;
-
-            float rdiff = (radiusBottom - radiusTop) / (float)verticalSegments;
-
-            //Vector3 translation = matrix.ExtractTranslation();
-            //matrix.ClearTranslation();
-
-            //Debug.WriteLine(brown.ToString());
-            //Debug.WriteLine(position + Direction);
-            //Debug.WriteLine(theta.ToString());
-            //Debug.WriteLine(segmentLength);
-            //Debug.WriteLine(rdiff);
-
-
-            for (int i = 0; i < verticalSegments; i++)
-            {
-                for (int j = 0; j < horizontalSegments; j++)
-                {
-                    //Debug.WriteLine((float)Math.Sin(theta * j));
-
-                    float r1 = radiusBottom - rdiff * i;
-                    float r2 = radiusBottom - rdiff * (i + 1);
-
-                    Vertex vert1 = new Vertex(new Vector3(r1 * (float)Math.Sin(theta * j), segmentLength * i, r1 * (float)Math.Cos(theta * j)));
-                    Vertex vert2 = new Vertex(new Vector3(r2 * (float)Math.Sin(theta * j), segmentLength * (i + 1), r2 * (float)Math.Cos(theta * j)));
-                    Vertex vert3 = new Vertex(new Vector3(r1 * (float)Math.Sin(theta * (j + 1)), segmentLength * i, r1 * (float)Math.Cos(theta * (j + 1))));
-                    Vertex vert4 = new Vertex(new Vector3(r2 * (float)Math.Sin(theta * (j + 1)), segmentLength * (i + 1), r2 * (float)Math.Cos(theta * (j + 1))));
-
-                    //vert1.Position = new Vector3(matrix * new Vector4(vert1.Position, 1));// + translation;
-                    //vert2.Position = new Vector3(matrix * new Vector4(vert2.Position, 1));// + translation;
-                    //vert3.Position = new Vector3(matrix * new Vector4(vert3.Position, 1));// + translation;
-                    //vert4.Position = new Vector3(matrix * new Vector4(vert4.Position, 1));// + translation;
-
-                    //Debug.WriteLine(String.Format("i: {0}, j: {1}", i.ToString(), j.ToString()));
-                    //Debug.WriteLine((i * horizontalSegments + j));
-                    //Debug.WriteLine((i * horizontalSegments + j) + tris.Length / 2);
-
-                    tris[(i * horizontalSegments + j)] = new Tri(vert1, vert2, vert3);
-                    tris[(i * horizontalSegments + j) + tris.Length / 2] = new Tri(vert2, vert3, vert4);
-
-
-
-                }
-            }
-
-            // Debug.WriteLine("tris: " + String.Join(", \n", tris.Select(p => p.ToString()).ToArray()));
-            Mesh mesh = new Mesh(tris);
-            return mesh;
-        }
     }
-
-
 }
