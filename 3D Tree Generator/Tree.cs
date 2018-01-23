@@ -19,15 +19,16 @@ namespace _3D_Tree_Generator
     {
         public float Height { get; set; }
         public float TrunkRadius { get; set; }
+        public float TopRadius { get; set; }
         public float Noise { get; set; }
         public float MinDist { get; set; }
         public float MaxDist { get; set; }
         public int Seed { get; set; }
-        public float MinHeight { get; set; }
-        public float MinRadius { get; set; }
         public int Quality { get; set; }
         public int Segments { get; set; }
         public int Depth { get; set; }
+        public float Flare { get; set; }
+        public float FlareEnd { get; set; }
         public Expression TrunkFunction { get; set; }
         public Expression BranchFunction { get; set; }
 
@@ -35,14 +36,15 @@ namespace _3D_Tree_Generator
         {
             Height = height;
             TrunkRadius = radius;
+            TopRadius = 0f;
             MinDist = 1f;
             MaxDist = 2f;
             Seed = 100;
             Quality = 8;
             Segments = 20;
-            MinHeight = 0.1f;
-            MinRadius = 0.1f;
             Depth = 2;
+            Flare = 1;
+            FlareEnd = height / 10;
             IsTextured = false;
             TrunkFunction = new Expression("x");
             BranchFunction = new Expression("x");
@@ -56,12 +58,15 @@ namespace _3D_Tree_Generator
                 Height,
                 Segments,
                 Quality,
-                color: 0.2f,
-                topColor: 0.8f,
-                topRadius: 0.2f,
+                darkness: 0.2f,
+                topDarkness: 0.8f,
+                topRadius: TopRadius,
                 depth: Depth,
                 minDist: MinDist,
                 maxDist: MaxDist,
+                flare: Flare,
+                flareEnd: FlareEnd,
+                doFlare: false,
                 trunkFunction: TrunkFunction,
                 branchFunction: BranchFunction,
                 rnd: rnd
@@ -75,22 +80,24 @@ namespace _3D_Tree_Generator
         /// <param name="height"></param>
         /// <param name="segments"></param>
         /// <param name="quality"></param>
-        /// <param name="color">optional</param>
+        /// <param name="darkness">optional</param>
         /// <param name="topRadius">optional</param>
-        /// <param name="topColor">optional</param>
+        /// <param name="topDarkness">optional</param>
         /// <returns></returns>
         public static Tri[] GenerateBranch(float radius, float height, int segments, int quality,
-                                                float color = 0.5f,
+                                                float darkness = 0.5f,
                                                 float topRadius = 0f,
-                                                float topColor = -1f,
-                                                int depth = 1,
+                                                float topDarkness = -1f,
+                                                int depth = 0,
                                                 float minDist = 1f,
                                                 float maxDist = 2f,
                                                 float flare = 0f,
                                                 float flareEnd = 0f,
+                                                bool doFlare = false,
                                                 Expression trunkFunction = null,
                                                 Expression branchFunction = null,
                                                 Random rnd = null
+                                              
                                             )
         {
             if (rnd == null)
@@ -100,7 +107,12 @@ namespace _3D_Tree_Generator
             List<Vertex> verts = new List<Vertex>();
             List<Tri> tris = new List<Tri>();
             //create the bottom ring of vertices
-            verts.AddRange(CreateCrossSection(radius, quality, color, 1 + flare).Select(e => e.Transformed(Matrix4.CreateTranslation(0, 0, -radius * (flare) / 2f))));
+
+            if (!doFlare)
+            {
+                flare = 0;
+            }
+            verts.AddRange(CreateCrossSection(radius, quality, darkness, 1 + flare).Select(e => e.Transformed(Matrix4.CreateTranslation(0, 0, -radius * (flare) / 2f))));
 
             float distSinceBranch = 0; //so that branches are ot too close to eachother or the base of the branch
             double Y = rnd.Range(0, 1.5);
@@ -125,10 +137,10 @@ namespace _3D_Tree_Generator
                     delta = currentHeight.InterpRoot(0, flareEnd, flare, 0);
                     matrix = matrix * Matrix4.CreateTranslation(0, 0, -currentRadius * (delta) / 2f);
                 }
-                float sliceColor = color;
-                if (topColor >= 0)
+                float sliceColor = darkness;
+                if (topDarkness >= 0)
                 {
-                    sliceColor = i.Lerp(0f, segments, color, topColor); //set color for current slice, if a gradient is wanted
+                    sliceColor = i.Lerp(0f, segments, darkness, topDarkness); //set color for current slice, if a gradient is wanted
                 }
 
 
@@ -157,8 +169,19 @@ namespace _3D_Tree_Generator
                     {
                         function = branchFunction;
                     }
-                    tris.AddRange(GenerateBranch(currentRadius / 2f, i.Lerp(0f, segments, height, 0) * (float)rnd.Range(0.8, 1.2),
-                        segments, quality, depth: depth-1, color: 0.2f, topColor: 0.8f, trunkFunction: function, flare: 1f, flareEnd: i.Lerp(0f, segments, height, 0) / 3f).Select(e => e.Transformed(matrix)));
+                    tris.AddRange(GenerateBranch(
+                        currentRadius / 2f, 
+                        i.Lerp(0f, segments, height, 0) * (float)rnd.Range(0.8, 1.2),
+                        segments, 
+                        quality, 
+                        depth: depth-1, 
+                        darkness: 0.2f, 
+                        topDarkness: 0.8f, 
+                        trunkFunction: function, 
+                        flare: i.Lerp(0f, segments, flare, 0), 
+                        flareEnd: i.Lerp(0f, segments, flareEnd, 0) / 3f, 
+                        doFlare: true
+                        ).Select(e => e.Transformed(matrix)));
                     distSinceBranch = 0;
                 }
             }
