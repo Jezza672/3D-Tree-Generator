@@ -97,7 +97,8 @@ namespace _3D_Tree_Generator
             this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.Shape_Functions = new System.Windows.Forms.GroupBox();
+            this.FPS_Counter = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Branching)).BeginInit();
@@ -114,7 +115,7 @@ namespace _3D_Tree_Generator
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox4.SuspendLayout();
+            this.Shape_Functions.SuspendLayout();
             this.SuspendLayout();
             // 
             // glControl1
@@ -801,27 +802,37 @@ namespace _3D_Tree_Generator
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Trunk";
             // 
-            // groupBox4
+            // Shape_Functions
             // 
-            this.groupBox4.Controls.Add(this.TrunkFunction);
-            this.groupBox4.Controls.Add(this.label8);
-            this.groupBox4.Controls.Add(this.button1);
-            this.groupBox4.Controls.Add(this.BranchFunction);
-            this.groupBox4.Controls.Add(this.button2);
-            this.groupBox4.Controls.Add(this.label9);
-            this.groupBox4.Location = new System.Drawing.Point(881, 419);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(374, 77);
-            this.groupBox4.TabIndex = 39;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Shape Functions";
+            this.Shape_Functions.Controls.Add(this.TrunkFunction);
+            this.Shape_Functions.Controls.Add(this.label8);
+            this.Shape_Functions.Controls.Add(this.button1);
+            this.Shape_Functions.Controls.Add(this.BranchFunction);
+            this.Shape_Functions.Controls.Add(this.button2);
+            this.Shape_Functions.Controls.Add(this.label9);
+            this.Shape_Functions.Location = new System.Drawing.Point(881, 419);
+            this.Shape_Functions.Name = "Shape_Functions";
+            this.Shape_Functions.Size = new System.Drawing.Size(374, 77);
+            this.Shape_Functions.TabIndex = 39;
+            this.Shape_Functions.TabStop = false;
+            this.Shape_Functions.Text = "Shape Functions";
+            // 
+            // FPS_Counter
+            // 
+            this.FPS_Counter.AutoSize = true;
+            this.FPS_Counter.Location = new System.Drawing.Point(31, 50);
+            this.FPS_Counter.Name = "FPS_Counter";
+            this.FPS_Counter.Size = new System.Drawing.Size(45, 13);
+            this.FPS_Counter.TabIndex = 40;
+            this.FPS_Counter.Text = "FPS: 00";
             // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
-            this.Controls.Add(this.groupBox4);
+            this.Controls.Add(this.FPS_Counter);
+            this.Controls.Add(this.Shape_Functions);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.RefreshButton);
@@ -853,8 +864,8 @@ namespace _3D_Tree_Generator
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
+            this.Shape_Functions.ResumeLayout(false);
+            this.Shape_Functions.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -926,7 +937,8 @@ namespace _3D_Tree_Generator
         private NumericUpDown numericUpDown5;
         private GroupBox groupBox2;
         private GroupBox groupBox3;
-        private GroupBox groupBox4;
+        private GroupBox Shape_Functions;
+        private Label FPS_Counter;
     }
 }
 

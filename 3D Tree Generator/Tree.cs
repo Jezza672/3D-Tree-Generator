@@ -39,7 +39,7 @@ namespace _3D_Tree_Generator
             TopRadius = 0f;
             MinDist = 1f;
             MaxDist = 2f;
-            Seed = 100;
+            Seed = 0;
             Quality = 8;
             Segments = 20;
             Depth = 2;

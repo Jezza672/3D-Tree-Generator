@@ -51,6 +51,8 @@ namespace _3D_Tree_Generator
         const float fps = 20f;
         Timer timer;
 
+        DateTime prevTime = DateTime.Now;
+
         Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
         string activeShader = "default";
 
@@ -73,11 +75,6 @@ namespace _3D_Tree_Generator
         private void TimerTick(object source, EventArgs e)
         {
             glControl1_Paint(glControl1, EventArgs.Empty);
-        }
-
-        public float function(double x)
-        {
-            return (float)( Math.Pow(x, 6));
         }
 
         /// <summary>
@@ -122,6 +119,8 @@ namespace _3D_Tree_Generator
             timer.Tick += new EventHandler(TimerTick);
             timer.Interval = (int)(1000 / fps);
 
+            
+
             timer.Start();
             autoRefreshToolStripMenuItem.Checked = true;
 
@@ -145,8 +144,6 @@ namespace _3D_Tree_Generator
         /// </summary>
         private void update()
         {
-            int interval = timer.Interval;
-            time += interval;
             //Debug.WriteLine(1000 / interval);
 
             //get data
@@ -247,26 +244,26 @@ namespace _3D_Tree_Generator
 
         private void glControl1_Paint(object sender, EventArgs e)
         {
+            double timeTaken = (DateTime.Now - prevTime).TotalSeconds;
+            prevTime = DateTime.Now;
+            this.Controls["FPS_Counter"].Text = "FPS: " + (1/ timeTaken).ToString("000.00");
             //update(); //remove once updates are called by events
 
             //GL.Viewport(0, 0, glControl1.Width, glControl1.Height);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-
-
             shaders[activeShader].EnableVertexAttribArrays();
-
 
             int indiceat = 0;
 
             foreach (Mesh v in objects)
             {
 
-                GL.UniformMatrix4(shaders[activeShader].GetUniform("modelview"), false, ref v.ModelViewProjectionMatrix);
+                GL.UniformMatrix4(shaders[activeShader].GetUniform("modelview"), false, ref v.ModelViewProjectionMatrix); //send modelview to shader
                 //Debug.WriteLine(v.IsTextured);
                 if (v.IsTextured)
                 {
-                    if (shaders[activeShader].GetUniform("maintexture") != -1)
+                    if (shaders[activeShader].GetUniform("maintexture") != -1) //send texture to shader if textured
                     {
                         GL.ActiveTexture(TextureUnit.Texture0);
                         GL.BindTexture(TextureTarget.Texture2D, v.Texture.TexID);
@@ -275,13 +272,11 @@ namespace _3D_Tree_Generator
                     }
 
                 }
-                GL.DrawElements(BeginMode.Triangles, v.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint));
+                GL.DrawElements(BeginMode.Triangles, v.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint)); //draw this object
                 indiceat += v.Indices.Length;
             }
 
-
             shaders[activeShader].DisableVertexAttribArrays();
-
 
             GL.Flush();
             glControl1.SwapBuffers();
@@ -323,8 +318,8 @@ namespace _3D_Tree_Generator
 
         private void Function_Update(object sender, EventArgs e)
         {
-            TextBox box = this.Controls[(sender as Control).AccessibleName] as TextBox;
-            if (box.Text == "")
+            TextBox box = Shape_Functions.Controls[(sender as Control).AccessibleName] as TextBox;
+            if (box.Text == "" || box.Text == null)
             {
                 box.Text = " ";
             }
