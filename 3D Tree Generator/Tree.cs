@@ -87,6 +87,7 @@ namespace _3D_Tree_Generator
         public static Tri[] GenerateBranch(float radius, float height, int segments, int quality,
                                                 float darkness = 0.5f,
                                                 float topRadius = 0f,
+                                                float branchTopRadiusFactor = 0.4f,
                                                 float topDarkness = -1f,
                                                 int depth = 0,
                                                 float minDist = 1f,
@@ -170,12 +171,14 @@ namespace _3D_Tree_Generator
                         function = branchFunction;
                     }
                     tris.AddRange(GenerateBranch(
-                        currentRadius / 2f, 
+                        currentRadius / 2f,
                         i.Lerp(0f, segments, height, 0) * (float)rnd.Range(0.8, 1.2),
-                        segments, 
-                        quality, 
-                        depth: depth-1, 
-                        darkness: 0.2f, 
+                        segments,
+                        quality,
+                        depth: depth - 1,
+                        darkness: 0.2f,
+                        topRadius: branchTopRadiusFactor * (currentRadius / 2f),
+                        branchTopRadiusFactor: branchTopRadiusFactor,
                         topDarkness: 0.8f, 
                         trunkFunction: function, 
                         flare: i.Lerp(0f, segments, flare, 0), 

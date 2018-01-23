@@ -304,10 +304,12 @@ namespace _3D_Tree_Generator
         {
             if (sender.GetType() == typeof(NumericUpDown))
             {
-                //Debug.WriteLine("wroks");
-                NumericUpDown num = sender as NumericUpDown;
+                NumericUpDown num = sender as NumericUpDown; //turn the generic sender into the specific NumericUpDown type
+                //this extracts the property of the tree to be changed, based on the AccessibleName of the sender
                 var property = tree.GetType().GetProperty(num.AccessibleName);  //https://stackoverflow.com/questions/737151/how-to-get-the-list-of-properties-of-a-class
+                //this sets the afformentioned property to the value of the NumericUpDown
                 property.SetValue(tree, Convert.ChangeType(num.Value, property.PropertyType));
+                //then regenerate the tree with new property and update the scene, if auto-refresh is enabled.
                 if (this.autoRefreshToolStripMenuItem.Checked)
                 {
                     tree.GenerateTree();
