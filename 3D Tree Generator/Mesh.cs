@@ -142,6 +142,8 @@ namespace _3D_Tree_Generator
             }
         }
 
+        public List<Mesh> Children;
+
         public string Name;
 
         /// <summary>
@@ -154,7 +156,8 @@ namespace _3D_Tree_Generator
             scale = Vector3.One;
             CalculateModelMatrix();
             ModelViewProjectionMatrix = Matrix4.Identity;
-            tris = new Tri[] { new Tri()};
+            tris = new Tri[0];
+            Children = new List<Mesh>();
         }
 
         public Mesh(Tri[] newFaces) : this()
@@ -384,6 +387,10 @@ namespace _3D_Tree_Generator
             //Debug.WriteLine("Model View Projection Matrix:");
             //Debug.WriteLine(ModelViewProjectionMatrix.ToString());
             //Debug.WriteLine("");
+            foreach(Mesh child in Children)
+            {
+                child.CalculateModelViewProjectionMatrix(ViewProjectionMatrix);
+            }
         }
 
         public Mesh AddTris(Tri[] tris)

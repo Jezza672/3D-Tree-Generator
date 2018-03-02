@@ -48,7 +48,7 @@ namespace _3D_Tree_Generator
         Tree tree = new Tree(10f, 1f, Matrix4.Identity);
 
         float time = 0.0f;
-        const float fps = 20f;
+        const float fps = 400f;
         Timer timer;
 
         DateTime prevTime = DateTime.Now;
@@ -61,6 +61,8 @@ namespace _3D_Tree_Generator
 
         Matrix4 ProjectionMatrix;
         Matrix4 ViewProjectionMatrix;
+
+        BindingList<Leaf> Leaves = new BindingList<Leaf>();
 
         public Window() //contructor for the window
         {
@@ -84,10 +86,20 @@ namespace _3D_Tree_Generator
         /// <param name="e"></param>
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
+            try
+            {
+                Debug.WriteLine("Starting Tree Generation");
+                tree.GenerateTree();
+                tree.Texture = Texture.Default;
+                objects.Add(tree);
+            }
+            catch (ArgumentException o)
+            {
+                Debug.WriteLine("User Cancelled");
+            }
+            
 
-            tree.GenerateTree();
-            objects.Add(tree);
-
+            
             //Expression exp = new Expression("x*x", EvaluateOptions.IgnoreCase);
             //Debug.WriteLine(exp.Eval(10));
 
@@ -135,25 +147,13 @@ namespace _3D_Tree_Generator
 
             shaders.Add("default", new Shader("Resources/Shaders/vs.glsl", "Resources/Shaders/fs.glsl", true));
             shaders.Add("textured", new Shader("Resources/Shaders/vs_tex.glsl", "Resources/Shaders/fs_tex.glsl", true));
-            activeShader = "default";
+            activeShader = "textured";
 
         }
 
-        /// <summary>
-        /// Call whenever anything is changed in the scene.
-        /// </summary>
-        private void update()
+        private int addObjects(List<Mesh> objs, int vertcount,  ref List<Vector3> verts, ref List<int> inds, ref List<Vector3> colors, ref List<Vector2> texcoords)
         {
-            //Debug.WriteLine(1000 / interval);
-
-            //get data
-            List<Vector3> verts = new List<Vector3>(); // create lists for adding all data from every object
-            List<int> inds = new List<int>();
-            List<Vector3> colors = new List<Vector3>();
-            List<Vector2> texcoords = new List<Vector2>();
-
-            int vertcount = 0;
-            foreach (Mesh v in objects) // add data from each object in turn
+            foreach (Mesh v in objs) // add data from each object in turn
             {
                 /*
                 Debug.WriteLine(v.Vertices.Length + " Verts are: " + String.Join(", ", v.Vertices));
@@ -173,7 +173,26 @@ namespace _3D_Tree_Generator
                 }
                 vertcount += v.Vertices.Length;
 
+                vertcount = addObjects(v.Children, vertcount, ref verts, ref inds, ref colors, ref texcoords);
             }
+            return vertcount;
+        }
+
+        /// <summary>
+        /// Call whenever anything is changed in the scene.
+        /// </summary>
+        private void update()
+        {
+            //Debug.WriteLine(1000 / interval);
+
+            //get data
+            List<Vector3> verts = new List<Vector3>(); // create lists for adding all data from every object
+            List<int> inds = new List<int>();
+            List<Vector3> colors = new List<Vector3>();
+            List<Vector2> texcoords = new List<Vector2>();
+
+            addObjects(objects, 0, ref verts, ref inds, ref colors, ref texcoords);
+
             vertdata = verts.ToArray(); // turn lists to arrays
             indicedata = inds.ToArray();
             coldata = colors.ToArray();
@@ -244,9 +263,10 @@ namespace _3D_Tree_Generator
 
         private void glControl1_Paint(object sender, EventArgs e)
         {
-            double timeTaken = (DateTime.Now - prevTime).TotalSeconds;
+            //Debug.WriteLine("frame");
+            double timeTaken = (DateTime.Now - prevTime).TotalMilliseconds;
             prevTime = DateTime.Now;
-            this.Controls["FPS_Counter"].Text = "FPS: " + (1/ timeTaken).ToString("000.00");
+            this.Controls["FPS_Counter"].Text = "Time to render: " + (timeTaken).ToString("0000.0") + " ms";
             //update(); //remove once updates are called by events
 
             //GL.Viewport(0, 0, glControl1.Width, glControl1.Height);
@@ -259,28 +279,44 @@ namespace _3D_Tree_Generator
             foreach (Mesh v in objects)
             {
 
-                GL.UniformMatrix4(shaders[activeShader].GetUniform("modelview"), false, ref v.ModelViewProjectionMatrix); //send modelview to shader
-                //Debug.WriteLine(v.IsTextured);
-                if (v.IsTextured)
-                {
-                    if (shaders[activeShader].GetUniform("maintexture") != -1) //send texture to shader if textured
-                    {
-                        GL.ActiveTexture(TextureUnit.Texture0);
-                        GL.BindTexture(TextureTarget.Texture2D, v.Texture.TexID);
-                        GL.Uniform1(shaders[activeShader].GetUniform("maintexture"), 0);
-                        //Debug.WriteLine("Sent Texture");
-                    }
-
-                }
-                GL.DrawElements(BeginMode.Triangles, v.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint)); //draw this object
-                indiceat += v.Indices.Length;
+                indiceat = drawMesh(v, indiceat);            
             }
-
+   
             shaders[activeShader].DisableVertexAttribArrays();
 
             GL.Flush();
             glControl1.SwapBuffers();
             //Debug.WriteLine("Paint");
+        }
+
+        private int drawMesh(Mesh v, int indiceat)
+        {
+            //Debug.WriteLine(v);
+            GL.UniformMatrix4(shaders[activeShader].GetUniform("modelview"), false, ref v.ModelViewProjectionMatrix); //send modelview to shader
+                                                                                                                      //Debug.WriteLine(v.IsTextured);
+            if (v.IsTextured)
+            {
+                if (shaders[activeShader].GetUniform("maintexture") != -1) //send texture to shader if textured
+                {
+                    Debug.WriteLine(((v is Tree) ? "Tree " : "Leaf ") + v.Texture.TexID);
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, v.Texture.TexID);
+                    GL.Uniform1(shaders[activeShader].GetUniform("maintexture"), 0);
+                    //Debug.WriteLine("Sent Texture");
+                }
+
+            }
+            GL.DrawElements(BeginMode.Triangles, v.Indices.Length, DrawElementsType.UnsignedInt, indiceat * sizeof(uint)); //draw this object
+            indiceat += v.Indices.Length;
+            if (v.Children.Count != 0)
+            {
+                foreach (Mesh c in v.Children)
+                {
+                    Debug.WriteLine(((c is Tree) ? "Tree " : "Leaf ") + v.Texture.TexID);
+                    indiceat = drawMesh(c, indiceat);
+                }
+            }
+            return indiceat;
         }
 
         private void glControl1_MouseWheel(object sender, MouseEventArgs e)
@@ -342,13 +378,42 @@ namespace _3D_Tree_Generator
                         update();
                     }
                 }
-                catch (ArgumentException)
+                catch (ArgumentException )
                 {
                     MessageBox.Show("Must be a function in x!", "Invalid Function", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); //https://stackoverflow.com/questions/3803630/how-to-call-window-alertmessage-from-c
+                }
+                catch (InvalidCastException)
+                {
+                    MessageBox.Show("Must be a function in x!", "Invalid Function", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
         }
 
+        private void createNewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Leaves.Add(new Leaf());
+            }
+            catch (ArgumentException)
+            {
+
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show(String.Format("Unable to create Leaf: \n {0}", error));
+            }
+            BindingSource bSource = new BindingSource();
+            bSource.DataSource = Leaves;
+            leaf_selector.DataSource = bSource;
+        }
+
+
+        private void leaf_selector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            pictureBox1.Image = Image.FromFile(((Leaf)leaf_selector.SelectedValue).AltImage);
+            ((Tree)objects[0]).Leaf = Leaves[leaf_selector.SelectedIndex];
+        }
 
         private void SaveAs(object sender, EventArgs e)
         {

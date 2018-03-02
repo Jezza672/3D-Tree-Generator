@@ -20,6 +20,8 @@ namespace _3D_Tree_Generator
     {
         public int TexID;
 
+        public static Texture Default = new Texture("Resources/Textures/Default.jpg");
+
         public Texture(Bitmap image)
         {
             TexID = GL.GenTexture();

@@ -31,9 +31,14 @@ namespace _3D_Tree_Generator
         public float FlareEnd { get; set; }
         public Expression TrunkFunction { get; set; }
         public Expression BranchFunction { get; set; }
+        public int LeafNum { get; set; }
+        public Leaf Leaf { get; set; }
+
+        
 
         public Tree(float height, float radius, Matrix4 position)
         {
+            Debug.WriteLine("Initialising Tree Parameters");
             Height = height;
             TrunkRadius = radius;
             TopRadius = 0f;
@@ -48,11 +53,16 @@ namespace _3D_Tree_Generator
             IsTextured = false;
             TrunkFunction = new Expression("x");
             BranchFunction = new Expression("x");
+            LeafNum = 50;
+            Leaf = null;
+            IsTextured = true;
+            Name = "Tree";
+            Debug.WriteLine("Finished Tree Intitalisation");
         }
 
         public void GenerateTree()
         {
-            Random rnd = new Random(Seed);
+            Random random = new Random(Seed);
             Tris = GenerateBranch(
                 TrunkRadius,
                 Height,
@@ -69,8 +79,12 @@ namespace _3D_Tree_Generator
                 doFlare: false,
                 trunkFunction: TrunkFunction,
                 branchFunction: BranchFunction,
-                rnd: rnd
+                rnd: random
                 );
+            if (Leaf != null)
+            {
+                AddLeaves(Leaf, random);
+            }
         }
 
         /// <summary>
@@ -103,7 +117,8 @@ namespace _3D_Tree_Generator
         {
             if (rnd == null)
             {
-                rnd = new Random((int)System.DateTime.Now.ToBinary());
+                Debug.WriteLine("New Random");
+                rnd = new Random();
             }
             List<Vertex> verts = new List<Vertex>();
             List<Tri> tris = new List<Tri>();
@@ -189,6 +204,19 @@ namespace _3D_Tree_Generator
                 }
             }
             return tris.ToArray();
+        }
+
+        public void AddLeaves(Leaf leaf, Random rnd)
+        {
+            foreach (Tri tri in Tris)
+            {
+                if (rnd.NextDouble() > 0.99)
+                {
+                    Leaf temp = new Leaf(leaf);
+                    temp.Position = tri.Item1.Position;
+                    Children.Add(temp);
+                }
+            }
         }
 
         /// <summary>

@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,6 +61,13 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Functions.cs" />
+    <Compile Include="Leaf.cs" />
+    <Compile Include="Leaf_Creator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Leaf_Creator.Designer.cs">
+      <DependentUpon>Leaf_Creator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Shader.cs" />
     <Compile Include="Test Classes\TestAxes.cs" />
     <Compile Include="Test Classes\TexturedTestCube.cs" />
@@ -78,6 +86,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Leaf_Creator.resx">
+      <DependentUpon>Leaf_Creator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Window.resx">
       <DependentUpon>Window.cs</DependentUpon>
     </EmbeddedResource>
@@ -90,6 +101,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="OpenTK.dll.config" />
     <None Include="Resources\Objects\Car.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -97,7 +109,6 @@
     <None Include="Resources\Objects\Cube.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -126,7 +137,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Textures\Default.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures\LeafTest.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures\Marker.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures\TestLeaf.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -48,21 +48,16 @@ namespace _3D_Tree_Generator
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.currentTreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.forrestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.environmentToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fieldOfViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.frameRateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.leafToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.screenshotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.environmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createNewToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.guideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Branching = new System.Windows.Forms.NumericUpDown();
@@ -99,6 +94,12 @@ namespace _3D_Tree_Generator
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.Shape_Functions = new System.Windows.Forms.GroupBox();
             this.FPS_Counter = new System.Windows.Forms.Label();
+            this.leaf_selector = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
+            this.label15 = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Branching)).BeginInit();
@@ -116,6 +117,9 @@ namespace _3D_Tree_Generator
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.Shape_Functions.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).BeginInit();
             this.SuspendLayout();
             // 
             // glControl1
@@ -177,7 +181,6 @@ namespace _3D_Tree_Generator
             this.editToolStripMenuItem,
             this.viewToolStripMenuItem,
             this.leafToolStripMenuItem,
-            this.environmentToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -228,10 +231,9 @@ namespace _3D_Tree_Generator
             // 
             this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.currentTreeToolStripMenuItem,
-            this.forrestToolStripMenuItem,
-            this.environmentToolStripMenuItem1});
+            this.forrestToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // currentTreeToolStripMenuItem
@@ -245,12 +247,6 @@ namespace _3D_Tree_Generator
             this.forrestToolStripMenuItem.Name = "forrestToolStripMenuItem";
             this.forrestToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.forrestToolStripMenuItem.Text = "Forrest";
-            // 
-            // environmentToolStripMenuItem1
-            // 
-            this.environmentToolStripMenuItem1.Name = "environmentToolStripMenuItem1";
-            this.environmentToolStripMenuItem1.Size = new System.Drawing.Size(142, 22);
-            this.environmentToolStripMenuItem1.Text = "Environment";
             // 
             // closeToolStripMenuItem
             // 
@@ -282,17 +278,10 @@ namespace _3D_Tree_Generator
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fieldOfViewToolStripMenuItem,
             this.frameRateToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "View";
-            // 
-            // fieldOfViewToolStripMenuItem
-            // 
-            this.fieldOfViewToolStripMenuItem.Name = "fieldOfViewToolStripMenuItem";
-            this.fieldOfViewToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
-            this.fieldOfViewToolStripMenuItem.Text = "Field Of View";
             // 
             // frameRateToolStripMenuItem
             // 
@@ -315,6 +304,7 @@ namespace _3D_Tree_Generator
             this.createNewToolStripMenuItem.Name = "createNewToolStripMenuItem";
             this.createNewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.createNewToolStripMenuItem.Text = "Create New";
+            this.createNewToolStripMenuItem.Click += new System.EventHandler(this.createNewToolStripMenuItem_Click);
             // 
             // loadToolStripMenuItem
             // 
@@ -327,27 +317,6 @@ namespace _3D_Tree_Generator
             this.screenshotToolStripMenuItem.Name = "screenshotToolStripMenuItem";
             this.screenshotToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.screenshotToolStripMenuItem.Text = "Screenshot";
-            // 
-            // environmentToolStripMenuItem
-            // 
-            this.environmentToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.createNewToolStripMenuItem1,
-            this.loadToolStripMenuItem1});
-            this.environmentToolStripMenuItem.Name = "environmentToolStripMenuItem";
-            this.environmentToolStripMenuItem.Size = new System.Drawing.Size(87, 20);
-            this.environmentToolStripMenuItem.Text = "Environment";
-            // 
-            // createNewToolStripMenuItem1
-            // 
-            this.createNewToolStripMenuItem1.Name = "createNewToolStripMenuItem1";
-            this.createNewToolStripMenuItem1.Size = new System.Drawing.Size(135, 22);
-            this.createNewToolStripMenuItem1.Text = "Create New";
-            // 
-            // loadToolStripMenuItem1
-            // 
-            this.loadToolStripMenuItem1.Name = "loadToolStripMenuItem1";
-            this.loadToolStripMenuItem1.Size = new System.Drawing.Size(135, 22);
-            this.loadToolStripMenuItem1.Text = "Load";
             // 
             // helpToolStripMenuItem
             // 
@@ -826,6 +795,76 @@ namespace _3D_Tree_Generator
             this.FPS_Counter.TabIndex = 40;
             this.FPS_Counter.Text = "FPS: 00";
             // 
+            // leaf_selector
+            // 
+            this.leaf_selector.FormattingEnabled = true;
+            this.leaf_selector.Location = new System.Drawing.Point(40, 182);
+            this.leaf_selector.Name = "leaf_selector";
+            this.leaf_selector.Size = new System.Drawing.Size(179, 21);
+            this.leaf_selector.TabIndex = 41;
+            this.leaf_selector.SelectedIndexChanged += new System.EventHandler(this.leaf_selector_SelectedIndexChanged);
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(6, 184);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(28, 13);
+            this.label14.TabIndex = 42;
+            this.label14.Text = "Leaf";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBox1.Location = new System.Drawing.Point(6, 220);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(144, 160);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 43;
+            this.pictureBox1.TabStop = false;
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.label15);
+            this.groupBox4.Controls.Add(this.numericUpDown6);
+            this.groupBox4.Controls.Add(this.leaf_selector);
+            this.groupBox4.Controls.Add(this.pictureBox1);
+            this.groupBox4.Controls.Add(this.label14);
+            this.groupBox4.Location = new System.Drawing.Point(852, 27);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(225, 386);
+            this.groupBox4.TabIndex = 44;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Leaves";
+            // 
+            // numericUpDown6
+            // 
+            this.numericUpDown6.AccessibleName = "LeafNum";
+            this.numericUpDown6.Location = new System.Drawing.Point(176, 151);
+            this.numericUpDown6.Maximum = new decimal(new int[] {
+            300,
+            0,
+            0,
+            0});
+            this.numericUpDown6.Name = "numericUpDown6";
+            this.numericUpDown6.Size = new System.Drawing.Size(43, 20);
+            this.numericUpDown6.TabIndex = 36;
+            this.numericUpDown6.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.numericUpDown6.ValueChanged += new System.EventHandler(this.ValueChanged);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(76, 153);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(94, 13);
+            this.label15.TabIndex = 36;
+            this.label15.Text = "Number of Leaves";
+            // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -840,6 +879,7 @@ namespace _3D_Tree_Generator
             this.Controls.Add(this.Seed);
             this.Controls.Add(this.glControl1);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.groupBox4);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Window";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -866,6 +906,10 @@ namespace _3D_Tree_Generator
             this.groupBox3.PerformLayout();
             this.Shape_Functions.ResumeLayout(false);
             this.Shape_Functions.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -889,7 +933,6 @@ namespace _3D_Tree_Generator
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem leafToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem environmentToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.NumericUpDown Branching;
         private System.Windows.Forms.Label label3;
@@ -898,15 +941,11 @@ namespace _3D_Tree_Generator
         private ToolStripMenuItem refreshToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem backgroundToolStripMenuItem;
-        private ToolStripMenuItem fieldOfViewToolStripMenuItem;
         private ToolStripMenuItem frameRateToolStripMenuItem;
         private ToolStripMenuItem createNewToolStripMenuItem;
         private ToolStripMenuItem loadToolStripMenuItem;
         private ToolStripMenuItem screenshotToolStripMenuItem;
-        private ToolStripMenuItem createNewToolStripMenuItem1;
-        private ToolStripMenuItem loadToolStripMenuItem1;
         private ToolStripMenuItem guideToolStripMenuItem;
-        private ToolStripMenuItem environmentToolStripMenuItem1;
         private Label label4;
         private NumericUpDown Quality;
         private Label label5;
@@ -939,6 +978,12 @@ namespace _3D_Tree_Generator
         private GroupBox groupBox3;
         private GroupBox Shape_Functions;
         private Label FPS_Counter;
+        private ComboBox leaf_selector;
+        private Label label14;
+        private PictureBox pictureBox1;
+        private GroupBox groupBox4;
+        private Label label15;
+        private NumericUpDown numericUpDown6;
     }
 }
 

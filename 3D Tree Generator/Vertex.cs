@@ -57,6 +57,13 @@ namespace _3D_Tree_Generator
             Color = new Vector3(0, 0, 0);
         }
 
+        public Vertex(Vector3 position, Vector2 texturecoordinate)
+        {
+            Position = position;
+            Normal = new Vector3(0, 0, 0);
+            TextureCoord = texturecoordinate;
+            Color = new Vector3(0, 0, 0);
+        }
 
         /// <summary>
         /// Vertex with position, normal and texture coordinate.
@@ -114,7 +121,7 @@ namespace _3D_Tree_Generator
         /// <returns></returns>
         public Vertex Transform(Matrix4 mat, Vector3 translation)
         {
-            Position = new Vector3(mat * new Vector4(Position, 1)) + translation;
+            Position = new Vector3(mat * (new Vector4(Position, 1))) + translation; // Vector3.Transform(Position, mat) + translation;
             //Position = Vector3.Transform(Position, mat);
             return this;
         }
