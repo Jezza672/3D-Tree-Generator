@@ -90,7 +90,7 @@ namespace _3D_Tree_Generator
             {
                 Debug.WriteLine("Starting Tree Generation");
                 tree.GenerateTree();
-                tree.Texture = Texture.Default;
+                tree.Texture = new Texture("Resources/Textures/TestLeaf.png");
                 objects.Add(tree);
             }
             catch (ArgumentException o)
