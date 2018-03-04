@@ -90,7 +90,7 @@ namespace _3D_Tree_Generator
             {
                 Debug.WriteLine("Starting Tree Generation");
                 tree.GenerateTree();
-                tree.Texture = new Texture("Resources/Textures/TestLeaf.png");
+                tree.Texture = Texture.Default;
                 objects.Add(tree);
             }
             catch (ArgumentException o)
@@ -298,7 +298,7 @@ namespace _3D_Tree_Generator
             {
                 if (shaders[activeShader].GetUniform("maintexture") != -1) //send texture to shader if textured
                 {
-                    Debug.WriteLine(((v is Tree) ? "Tree " : "Leaf ") + v.Texture.TexID);
+                    //Debug.WriteLine(((v is Tree) ? "Tree " : "Leaf ") + v.Texture.TexID);
                     GL.ActiveTexture(TextureUnit.Texture0);
                     GL.BindTexture(TextureTarget.Texture2D, v.Texture.TexID);
                     GL.Uniform1(shaders[activeShader].GetUniform("maintexture"), 0);
@@ -312,7 +312,7 @@ namespace _3D_Tree_Generator
             {
                 foreach (Mesh c in v.Children)
                 {
-                    Debug.WriteLine(((c is Tree) ? "Tree " : "Leaf ") + v.Texture.TexID);
+                    //Debug.WriteLine(((c is Tree) ? "Tree " : "Leaf ") + v.Texture.TexID);
                     indiceat = drawMesh(c, indiceat);
                 }
             }

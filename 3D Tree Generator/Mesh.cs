@@ -68,7 +68,13 @@ namespace _3D_Tree_Generator
         public Vector2[] TexCoords { get; set; }
         public Texture Texture { get; set; }
 
-        public bool IsTextured = false;
+        public bool IsTextured
+        {
+            get
+            {
+                return Texture != null && Texture.TexID != -1;
+            }
+        }
 
         private Vector3[] colors;
         public Vector3[] Colors
@@ -210,7 +216,6 @@ namespace _3D_Tree_Generator
 
         public Mesh(Vector3[] vertices, int[] indices, Vector3[] normals, Vector2[] texs) : this()
         {
-            IsTextured = true;
 
             List<Tri> newFaces = new List<Tri>();
             if (normals.Length < vertices.Length)

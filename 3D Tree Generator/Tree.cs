@@ -50,12 +50,10 @@ namespace _3D_Tree_Generator
             Depth = 2;
             Flare = 1;
             FlareEnd = height / 10;
-            IsTextured = false;
             TrunkFunction = new Expression("x");
             BranchFunction = new Expression("x");
             LeafNum = 50;
             Leaf = null;
-            IsTextured = true;
             Name = "Tree";
             Debug.WriteLine("Finished Tree Intitalisation");
         }
@@ -194,11 +192,12 @@ namespace _3D_Tree_Generator
                         darkness: 0.2f,
                         topRadius: branchTopRadiusFactor * (currentRadius / 2f),
                         branchTopRadiusFactor: branchTopRadiusFactor,
-                        topDarkness: 0.8f, 
-                        trunkFunction: function, 
-                        flare: i.Lerp(0f, segments, flare, 0), 
-                        flareEnd: i.Lerp(0f, segments, flareEnd, 0) / 3f, 
-                        doFlare: true
+                        topDarkness: 0.8f,
+                        trunkFunction: function,
+                        flare: i.Lerp(0f, segments, flare, 0),
+                        flareEnd: i.Lerp(0f, segments, flareEnd, 0) / 3f,
+                        doFlare: true,
+                        rnd: rnd
                         ).Select(e => e.Transformed(matrix)));
                     distSinceBranch = 0;
                 }
@@ -208,6 +207,7 @@ namespace _3D_Tree_Generator
 
         public void AddLeaves(Leaf leaf, Random rnd)
         {
+            Children = new List<Mesh>();
             foreach (Tri tri in Tris)
             {
                 if (rnd.NextDouble() > 0.99)
