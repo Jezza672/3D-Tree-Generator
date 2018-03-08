@@ -29,16 +29,22 @@ namespace _3D_Tree_Generator
         public int Depth { get; set; }
         public float Flare { get; set; }
         public float FlareEnd { get; set; }
+        public float BendXStrength { get; set; }
+        public float BendYStrength { get; set; }
         public Expression TrunkFunction { get; set; }
         public Expression BranchFunction { get; set; }
+        public Expression BendXFunction { get; set; }
+        public Expression BendZFunction { get; set; }
         public int LeafNum { get; set; }
         public Leaf Leaf { get; set; }
 
-        
+        public Tree()
+        {
+
+        }
 
         public Tree(float height, float radius, Matrix4 position)
         {
-            Debug.WriteLine("Initialising Tree Parameters");
             Height = height;
             TrunkRadius = radius;
             TopRadius = 0f;
@@ -50,12 +56,15 @@ namespace _3D_Tree_Generator
             Depth = 2;
             Flare = 1;
             FlareEnd = height / 10;
+            BendXStrength = 0f;
+            BendYStrength = 0f;
             TrunkFunction = new Expression("x");
             BranchFunction = new Expression("x");
+            BendXFunction = new Expression("0");
+            BendZFunction = new Expression("0");
             LeafNum = 50;
             Leaf = null;
             Name = "Tree";
-            Debug.WriteLine("Finished Tree Intitalisation");
         }
 
         public void GenerateTree()
@@ -75,8 +84,12 @@ namespace _3D_Tree_Generator
                 flare: Flare,
                 flareEnd: FlareEnd,
                 doFlare: false,
+                xBendStrength: BendXStrength,
+                zBendStrength: BendYStrength,
                 trunkFunction: TrunkFunction,
                 branchFunction: BranchFunction,
+                xBendFunction: BendXFunction,
+                zBendFunction: BendZFunction,
                 rnd: random
                 );
             if (Leaf != null)
@@ -107,32 +120,33 @@ namespace _3D_Tree_Generator
                                                 float flare = 0f,
                                                 float flareEnd = 0f,
                                                 bool doFlare = false,
+                                                float xBendStrength = 0f,
+                                                float zBendStrength = 0f,
                                                 Expression trunkFunction = null,
                                                 Expression branchFunction = null,
+                                                Expression xBendFunction = null,
+                                                Expression zBendFunction = null,
                                                 Random rnd = null
                                               
                                             )
         {
-            if (rnd == null)
-            {
-                Debug.WriteLine("New Random");
-                rnd = new Random();
-            }
+            rnd = (rnd == null) ? new Random() : rnd;
+            xBendFunction = (xBendFunction == null) ? new Expression("0") : xBendFunction;
+            zBendFunction = (zBendFunction == null) ? new Expression("0") : zBendFunction;
+
             List<Vertex> verts = new List<Vertex>();
             List<Tri> tris = new List<Tri>();
-            //create the bottom ring of vertices
 
-            if (!doFlare)
-            {
-                flare = 0;
-            }
+            //create the bottom ring of vertices
+            flare = !doFlare ? 0 : flare; //if doFlare is false, set the flare to 0, i.e. none
+            //create a cross section and transform it according to the amount of flare
             verts.AddRange(CreateCrossSection(radius, quality, darkness, 1 + flare).Select(e => e.Transformed(Matrix4.CreateTranslation(0, 0, -radius * (flare) / 2f))));
 
-            float distSinceBranch = 0; //so that branches are ot too close to eachother or the base of the branch
+            float distSinceBranch = 0; //so that branches are not too close to eachother or the base of the branch
             double Y = rnd.Range(0, 1.5);
             for (float i = 1; i < segments + 1; i++)
             {
-                float currentHeight = i.Lerp(0f, segments, 0, height); //Lerp (Linear interpolation -> see extension methods) to get current height
+                float currentHeight = i.Lerp(0, segments, 0, height); //Lerp (Linear interpolation -> see extension methods) to get current height
                 float currentRadius;
                 if (trunkFunction == null) // linear interpolate for radius if no trunk function is defined
                 {
@@ -144,45 +158,40 @@ namespace _3D_Tree_Generator
                     currentRadius = i.CustInterp(0, segments, radius, topRadius, trunkFunction);
                 }
 
-                Matrix4 matrix = Matrix4.CreateTranslation(0, currentHeight, 0); //define the translation to move the vertices generated to the current slice
+                float xOffset = xBendFunction.Eval(i) * xBendStrength;
+                float zOffset = zBendFunction.Eval(i) * zBendStrength;
+
+                //Debug.WriteLine(xOffset);
+                //Debug.WriteLine(zOffset);
+
+                Matrix4 matrix = Matrix4.CreateTranslation(xOffset, currentHeight, zOffset); //define the translation to move the vertices generated to the correct height
                 float delta = 0;
-                if (flare > 0 && currentHeight <= flareEnd) //if part of the flare, cause flaring
+                if (flare > 0 && currentHeight <= flareEnd) //cause flaring if less than the flareEnd amount
                 {
                     delta = currentHeight.InterpRoot(0, flareEnd, flare, 0);
                     matrix = matrix * Matrix4.CreateTranslation(0, 0, -currentRadius * (delta) / 2f);
                 }
-                float sliceColor = darkness;
-                if (topDarkness >= 0)
-                {
-                    sliceColor = i.Lerp(0f, segments, darkness, topDarkness); //set color for current slice, if a gradient is wanted
-                }
 
+                //if a colour gradient is wanted, create one, otherwise set to the default colour.
+                float sliceColor = (topDarkness >= 0) ? i.Lerp(0f, segments, darkness, topDarkness) : darkness;
 
                 //generate and add vertices to the vertex array, but apply the previously mentioned tranformations first
-                verts.AddRange(CreateCrossSection(currentRadius, quality, sliceColor, delta + 1).Select(e => e.Transformed(matrix)));
+                Vertex[] newVerts = CreateCrossSection(currentRadius, quality, sliceColor, delta + 1).Select(e => e.Transformed(matrix)).ToArray();
+                tris.AddRange(StitchCrossSection(verts, newVerts));
+                verts.AddRange(newVerts);
 
-                int pos = verts.Count - quality;
-                for (int j = 0; j < quality; j++) //this creates the triangles needed to join the previous slice with the current one
-                {
-                    //Debug.WriteLine("VertsCount: " + verts.Count);
-                    //Debug.WriteLine(String.Format("{0}, {1}, {2}", pos + j, pos + (j + 1) % quality, pos + j - quality));
-                    //Debug.WriteLine(String.Format("{0}, {1}, {2}", pos + j - quality, pos + (j + 1) % quality, pos - quality + (j + 1) % quality));
-                    tris.Add(new Tri(verts[pos + j], verts[pos + (j + 1) % quality], verts[pos + j - quality]));
-                    tris.Add(new Tri(verts[pos + j - quality], verts[pos + (j + 1) % quality], verts[pos - quality + (j + 1) % quality]));
-                }
                 distSinceBranch += height / segments;
+
                 //make the minimum distance be a random number between two decreasing values as you near the end of the branch
                 double minimumDistance = rnd.Range(i.Lerp(0, segments, minDist * 2, minDist), i.Lerp(0, segments, maxDist, maxDist/2));
-                if (distSinceBranch > minimumDistance && Convert.ToBoolean(depth)) //if we are past the minimum distance since the previous branch, create a new one
-                {
-                    
+                if (distSinceBranch > minimumDistance && depth != 0) //if we are past the minimum distance since the previous branch, create a new one
+                {            
                     matrix = Matrix4.CreateRotationY(currentHeight.CustInterp(0, height * (rnd.Range(0.9, 1.1)), 0, Math.PI * rnd.Range(10, 20), x => (float)(x*x))) * Matrix4.CreateRotationX(1) * Matrix4.CreateTranslation(0, currentHeight, 0);
                     Y += rnd.Range(i.Lerp(0, segments, 0.7, 0.2), i.Lerp(0, segments, 1.5, 0.5));
-                    Expression function = trunkFunction;
-                    if (branchFunction != null) //if there is a branch function specified, use that for branches else use the trunk function
-                    {
-                        function = branchFunction;
-                    }
+
+                    //if a seperate branch function is specified, use it, else use the trunk function
+                    Expression function = (branchFunction != null) ? branchFunction : trunkFunction;
+
                     tris.AddRange(GenerateBranch(
                         currentRadius / 2f,
                         i.Lerp(0f, segments, height, 0) * (float)rnd.Range(0.8, 1.2),
@@ -197,12 +206,36 @@ namespace _3D_Tree_Generator
                         flare: i.Lerp(0f, segments, flare, 0),
                         flareEnd: i.Lerp(0f, segments, flareEnd, 0) / 3f,
                         doFlare: true,
-                        rnd: rnd
+                        rnd: rnd,
+                        xBendFunction: xBendFunction,
+                        zBendFunction: zBendFunction,
+                        xBendStrength : i.Lerp(0f, segments, xBendStrength, 0),
+                        zBendStrength: i.Lerp(0f, segments, zBendStrength, 0)
                         ).Select(e => e.Transformed(matrix)));
                     distSinceBranch = 0;
                 }
             }
             return tris.ToArray();
+        }
+
+        /// <summary>
+        /// Create the geometry between the current triangles and the next layer of vertices
+        /// </summary>
+        /// <param name="tris">must be ordered correctly</param>
+        /// <param name="newVerts"></param>
+        /// <returns></returns>
+        public static List<Tri> StitchCrossSection(List<Vertex> verts   , Vertex[] newVerts)
+        {
+            int offset =  verts.Count - newVerts.Length; //to access the last few vertices added to the list of vertices
+            List<Tri> newTris = new List<Tri>(); 
+            for (int i = 0; i < newVerts.Length; i++) //create the geometry
+            {
+                //Debug.WriteLine((end + 2 * i).ToString() + " " + (end + 2 * i).ToString() + " " + i.ToString());
+                newTris.Add(new Tri(verts[offset + (i + 1) % newVerts.Length], verts[offset + i], newVerts[i]));
+                //Debug.WriteLine((end + 2 * i).ToString() + " " + ((i + 1) % verts.Length).ToString() + " " + i.ToString());
+                newTris.Add(new Tri(verts[offset + (i + 1) % newVerts.Length], newVerts[(i + 1) % newVerts.Length], newVerts[i]));
+            }
+            return newTris;
         }
 
         public void AddLeaves(Leaf leaf, Random rnd)
@@ -226,19 +259,23 @@ namespace _3D_Tree_Generator
         /// <param name="horizontalSegments"></param>
         /// <param name="num"></param>
         /// <returns>array ov vertices</returns>
-        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, float color, float zScale = 1)
+        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, Vector3 color, float zScale = 1)
         {
             Vertex[] verts = new Vertex[horizontalSegments];
             double theta = 2 * Math.PI / horizontalSegments;
 
             for (int i = 0; i < horizontalSegments; i++)
             {
-                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i) * zScale), Vector3.Zero, new Vector3((float)139 / 160 * color, (float)69 / 160 * color, (float)19 / 160 * color));
+                verts[i] = new Vertex(new Vector3(radius * (float)Math.Sin(theta * i), 0, radius * (float)Math.Cos(theta * i) * zScale), Vector3.Zero, color);
                 //Debug.WriteLine(verts[i].ToStringFull());
             }
 
             // Debug.WriteLine("tris: " + String.Join(", \n", tris.Select(p => p.ToString()).ToArray()));
             return verts;
+        }
+        public static Vertex[] CreateCrossSection(float radius, int horizontalSegments, float color = 0.5f, float zScale = 1)
+        {
+            return CreateCrossSection(radius, horizontalSegments, new Vector3((float)139 / 160 * color, (float)69 / 160 * color, (float)19 / 160 * color), zScale);
         }
     }
 }

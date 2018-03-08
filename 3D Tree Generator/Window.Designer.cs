@@ -98,8 +98,14 @@ namespace _3D_Tree_Generator
             this.label14 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
             this.label15 = new System.Windows.Forms.Label();
+            this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.label16 = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.button4 = new System.Windows.Forms.Button();
+            this.label17 = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Branching)).BeginInit();
@@ -233,19 +239,19 @@ namespace _3D_Tree_Generator
             this.currentTreeToolStripMenuItem,
             this.forrestToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // currentTreeToolStripMenuItem
             // 
             this.currentTreeToolStripMenuItem.Name = "currentTreeToolStripMenuItem";
-            this.currentTreeToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.currentTreeToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
             this.currentTreeToolStripMenuItem.Text = "Current Tree";
             // 
             // forrestToolStripMenuItem
             // 
             this.forrestToolStripMenuItem.Name = "forrestToolStripMenuItem";
-            this.forrestToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.forrestToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
             this.forrestToolStripMenuItem.Text = "Forrest";
             // 
             // closeToolStripMenuItem
@@ -286,7 +292,7 @@ namespace _3D_Tree_Generator
             // frameRateToolStripMenuItem
             // 
             this.frameRateToolStripMenuItem.Name = "frameRateToolStripMenuItem";
-            this.frameRateToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.frameRateToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.frameRateToolStripMenuItem.Text = "Frame Rate";
             // 
             // leafToolStripMenuItem
@@ -773,6 +779,12 @@ namespace _3D_Tree_Generator
             // 
             // Shape_Functions
             // 
+            this.Shape_Functions.Controls.Add(this.textBox2);
+            this.Shape_Functions.Controls.Add(this.button4);
+            this.Shape_Functions.Controls.Add(this.label17);
+            this.Shape_Functions.Controls.Add(this.textBox1);
+            this.Shape_Functions.Controls.Add(this.button3);
+            this.Shape_Functions.Controls.Add(this.label16);
             this.Shape_Functions.Controls.Add(this.TrunkFunction);
             this.Shape_Functions.Controls.Add(this.label8);
             this.Shape_Functions.Controls.Add(this.button1);
@@ -781,7 +793,7 @@ namespace _3D_Tree_Generator
             this.Shape_Functions.Controls.Add(this.label9);
             this.Shape_Functions.Location = new System.Drawing.Point(881, 419);
             this.Shape_Functions.Name = "Shape_Functions";
-            this.Shape_Functions.Size = new System.Drawing.Size(374, 77);
+            this.Shape_Functions.Size = new System.Drawing.Size(374, 135);
             this.Shape_Functions.TabIndex = 39;
             this.Shape_Functions.TabStop = false;
             this.Shape_Functions.Text = "Shape Functions";
@@ -837,6 +849,15 @@ namespace _3D_Tree_Generator
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Leaves";
             // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(76, 153);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(94, 13);
+            this.label15.TabIndex = 36;
+            this.label15.Text = "Number of Leaves";
+            // 
             // numericUpDown6
             // 
             this.numericUpDown6.AccessibleName = "LeafNum";
@@ -856,14 +877,63 @@ namespace _3D_Tree_Generator
             0});
             this.numericUpDown6.ValueChanged += new System.EventHandler(this.ValueChanged);
             // 
-            // label15
+            // textBox1
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(76, 153);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(94, 13);
-            this.label15.TabIndex = 36;
-            this.label15.Text = "Number of Leaves";
+            this.textBox1.AccessibleName = "BendXFunction";
+            this.textBox1.Location = new System.Drawing.Point(103, 72);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(194, 20);
+            this.textBox1.TabIndex = 23;
+            this.textBox1.Text = "0";
+            // 
+            // button3
+            // 
+            this.button3.AccessibleName = "BranchFunction";
+            this.button3.Location = new System.Drawing.Point(303, 72);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(59, 20);
+            this.button3.TabIndex = 25;
+            this.button3.Text = "Update";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // label16
+            // 
+            this.label16.AccessibleName = "";
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(55, 75);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(42, 13);
+            this.label16.TabIndex = 24;
+            this.label16.Text = "Bend X";
+            // 
+            // textBox2
+            // 
+            this.textBox2.AccessibleName = "BendYFunction";
+            this.textBox2.Location = new System.Drawing.Point(103, 99);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(194, 20);
+            this.textBox2.TabIndex = 26;
+            this.textBox2.Text = "0";
+            // 
+            // button4
+            // 
+            this.button4.AccessibleName = "BranchFunction";
+            this.button4.Location = new System.Drawing.Point(303, 99);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(59, 20);
+            this.button4.TabIndex = 28;
+            this.button4.Text = "Update";
+            this.button4.UseVisualStyleBackColor = true;
+            // 
+            // label17
+            // 
+            this.label17.AccessibleName = "";
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(55, 103);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(42, 13);
+            this.label17.TabIndex = 27;
+            this.label17.Text = "Bend Z";
             // 
             // Window
             // 
@@ -984,6 +1054,12 @@ namespace _3D_Tree_Generator
         private GroupBox groupBox4;
         private Label label15;
         private NumericUpDown numericUpDown6;
+        private TextBox textBox2;
+        private Button button4;
+        private Label label17;
+        private TextBox textBox1;
+        private Button button3;
+        private Label label16;
     }
 }
 

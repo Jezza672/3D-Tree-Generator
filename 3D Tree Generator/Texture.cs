@@ -59,7 +59,7 @@ namespace _3D_Tree_Generator
 
                 }
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 if (alert)
                 {

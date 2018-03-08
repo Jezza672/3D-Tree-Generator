@@ -70,6 +70,7 @@
     </Compile>
     <Compile Include="Shader.cs" />
     <Compile Include="Test Classes\TestAxes.cs" />
+    <Compile Include="Test Classes\TestTree.cs" />
     <Compile Include="Test Classes\TexturedTestCube.cs" />
     <Compile Include="Texture.cs" />
     <Compile Include="Tri.cs" />

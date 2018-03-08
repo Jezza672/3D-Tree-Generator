@@ -36,14 +36,19 @@ namespace _3D_Tree_Generator
             value = e.Eval(value);
             fromSource = e.Eval(fromSource);
             toSource = e.Eval(toSource);
-            return (float)((value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget);
+            if (toSource - fromSource == 0)
+            {
+                return 0;
+            }
+                return (float)((value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget);
         }
 
 
         public static float Eval(this Expression e, double value)
         {
             e.Parameters["x"] = value;
-            double solved = (double) e.Evaluate();
+            //Debug.WriteLine(e.Evaluate());
+            double solved = Convert.ToDouble(e.Evaluate());
             return (float) solved;
         }
 

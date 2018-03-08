@@ -25,17 +25,7 @@ namespace _3D_Tree_Generator
 {
     public partial class Window : Form
     {
-        int pgmID, vsID, fsID; // program, vertex shader and fragment shader IDs
-
-        int attribute_vcol; //shader attribute locations
-        int attribute_vpos;
-        int uniform_mview;
-
-        int vbo_position; //vertex buffer object pointer
         int ibo_elements; //integer buffer object pointer for indices
-        int vbo_color; //colour vbo pointer
-        int vbo_mview; // viewmatrix buffer pointer
-
 
         Vector3[] vertdata; // array of vertices to send to buffers
         int[] indicedata;
@@ -47,7 +37,6 @@ namespace _3D_Tree_Generator
         Camera camera = new Camera();
         Tree tree = new Tree(10f, 1f, Matrix4.Identity);
 
-        float time = 0.0f;
         const float fps = 400f;
         Timer timer;
 
@@ -86,20 +75,15 @@ namespace _3D_Tree_Generator
         /// <param name="e"></param>
         private void glControl1_Load(object sender, EventArgs e) //GLControl loaded all dlls
         {
-            try
-            {
-                Debug.WriteLine("Starting Tree Generation");
-                tree.GenerateTree();
-                tree.Texture = Texture.Default;
-                objects.Add(tree);
-            }
-            catch (ArgumentException o)
-            {
-                Debug.WriteLine("User Cancelled");
-            }
-            
 
-            
+            //tree.GenerateTree();
+            //objects.Add(tree);
+
+            TestTree testTree = new TestTree();
+            //testTree.TestConnectCrossSection();
+            testTree.GenerateTree();
+            objects.Add(testTree);
+        
             //Expression exp = new Expression("x*x", EvaluateOptions.IgnoreCase);
             //Debug.WriteLine(exp.Eval(10));
 
@@ -147,7 +131,7 @@ namespace _3D_Tree_Generator
 
             shaders.Add("default", new Shader("Resources/Shaders/vs.glsl", "Resources/Shaders/fs.glsl", true));
             shaders.Add("textured", new Shader("Resources/Shaders/vs_tex.glsl", "Resources/Shaders/fs_tex.glsl", true));
-            activeShader = "textured";
+            activeShader = "default";
 
         }
 
