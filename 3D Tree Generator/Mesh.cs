@@ -148,7 +148,7 @@ namespace _3D_Tree_Generator
             }
         }
 
-        public List<Mesh> Children;
+        public List<Mesh> Children { get; set; }
 
         public string Name;
 

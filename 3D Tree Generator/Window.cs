@@ -79,11 +79,17 @@ namespace _3D_Tree_Generator
             //tree.GenerateTree();
             //objects.Add(tree);
 
-            TestTree testTree = new TestTree();
+            //TestTree testTree = new TestTree();
             //testTree.TestConnectCrossSection();
-            testTree.GenerateTree();
-            objects.Add(testTree);
-        
+            //testTree.GenerateTree();
+            //objects.Add(testTree);
+
+            TestLeaf testLeaf = new TestLeaf(Vector3.Zero);
+            objects.Add(testLeaf);
+
+            TestLeaf testTwo = new TestLeaf(testLeaf, new Vector3(0, 1, 1));
+            objects.Add(testTwo);
+
             //Expression exp = new Expression("x*x", EvaluateOptions.IgnoreCase);
             //Debug.WriteLine(exp.Eval(10));
 
@@ -131,7 +137,7 @@ namespace _3D_Tree_Generator
 
             shaders.Add("default", new Shader("Resources/Shaders/vs.glsl", "Resources/Shaders/fs.glsl", true));
             shaders.Add("textured", new Shader("Resources/Shaders/vs_tex.glsl", "Resources/Shaders/fs_tex.glsl", true));
-            activeShader = "default";
+            activeShader = "textured";
 
         }
 

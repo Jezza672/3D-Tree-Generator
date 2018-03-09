@@ -195,6 +195,7 @@ namespace _3D_Tree_Generator.Test_Classes
 
             };
 
+            Texture = Texture.Default;
             Debug.WriteLine(String.Format("Created Test Axis at {0}", Position.ToString()));
         }
     }

@@ -66,19 +66,19 @@ namespace _3D_Tree_Generator
             {
                 Debug.WriteLine("Taller");
                 y = (int)((float)Y).Lerp(0, (double)numericUpDown2.Value, 0, pictureBox1.Size.Height);
-                double scalefactor = (double)image.Height / (double)pictureBox1.Height;
-                double newwidth = image.Width / scalefactor;
+                double scalefactor = (double)numericUpDown2.Value / (double)pictureBox1.Height;
+                double newwidth = (double)numericUpDown1.Value / scalefactor;
                 double delta = (pictureBox1.Width / 2) - (newwidth / 2);
-                x = (int)((float)X).Lerp(0, image.Width, delta, pictureBox1.Size.Width - delta);
+                x = (int)((float)X).Lerp(0, (double)numericUpDown1.Value, delta, pictureBox1.Size.Width - delta);
             }
             else
             {
                 Debug.WriteLine("Wider");
                 x = (int)((float)X).Lerp(0, (double)numericUpDown1.Value, 0, pictureBox1.Size.Width);
-                double scalefactor = (double)image.Width / (double)pictureBox1.Width;
-                double newheight = image.Height / scalefactor;
+                double scalefactor = (double)numericUpDown1.Value / (double)pictureBox1.Width;
+                double newheight = (double)numericUpDown2.Value / scalefactor;
                 double delta = (pictureBox1.Height / 2) - (newheight / 2);
-                y = (int)((float)Y).Lerp(0, image.Height, delta, pictureBox1.Size.Height - delta);
+                y = (int)((float)Y).Lerp(0, (double)numericUpDown2.Value, delta, pictureBox1.Size.Height - delta);
             }
             x -= 5;
             y -= 5;

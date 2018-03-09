@@ -73,6 +73,20 @@ namespace _3D_Tree_Generator
 
                 }
             }
+            catch (DirectoryNotFoundException)
+            {
+                if (alert)
+                {
+                    MessageBox.Show(String.Format("Texture \"{0}\" could not be found", fileName), "Texture Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                using (Stream bmpStream = System.IO.File.Open("Resources/Textures/Default.jpg", System.IO.FileMode.Open))
+                {
+                    Image image = Image.FromStream(bmpStream);
+
+                    bitmap = new Bitmap(image);
+
+                }
+            }
             return bitmap;
         }
     }

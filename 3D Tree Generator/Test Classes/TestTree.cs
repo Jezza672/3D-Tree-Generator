@@ -29,21 +29,22 @@ namespace _3D_Tree_Generator.Test_Classes
             TopRadius = 0f;
             MinDist = 1f;
             MaxDist = 2f;
-            Seed = 0;
+            Seed = 5;
             Quality = 8;
             Segments = 20;
             Depth = 2;
             Flare = 1;
             FlareEnd = 10 / 10;
-            BendXStrength = 0.2f;
-            BendYStrength = 0.2f;
+            BendXStrength = 0.3f;
+            BendYStrength = 0.3f;
             TrunkFunction = new Expression("x");
             BranchFunction = new Expression("x");
-            BendXFunction = new Expression("Sin(x)");
-            BendZFunction = new Expression("Cos(x)");
+            BendXFunction = new Expression("Sin(x) * (1/((x * 5 / 20)+1))");
+            BendZFunction = new Expression("Cos(x) * (1/((x * 5 / 20)+1))");
             LeafNum = 50;
-            Leaf = null;
+            Leaf = new Leaf();
             Name = "Tree";
+            Texture = new Texture("Resources/Textures/Colours/Brown.bmp");
             Debug.WriteLine("Finished Intitalising Test paramaters");
         }
 

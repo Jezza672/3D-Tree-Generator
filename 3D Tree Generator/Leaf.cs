@@ -26,7 +26,7 @@ namespace _3D_Tree_Generator
             form.ShowDialog();
             if (form.DialogResult == DialogResult.OK)
             {
-                Matrix4 trans = Matrix4.CreateTranslation(-form.centerx / divisor, 0, -form.centery / divisor);
+                Matrix4 trans = Matrix4.CreateTranslation((form.centerx - form.sizex) / divisor, 0, (form.centery - form.sizey )/ divisor);
                 Tris = GenerateRectangle(form.sizex / divisor, form.sizey / divisor).Select(i => i.Transformed(trans)).ToArray();
                 Texture = new Texture(form.filename);
                 Debug.WriteLine(String.Format("Created leaf with TexId: {0}", (Texture.TexID)));
@@ -48,18 +48,31 @@ namespace _3D_Tree_Generator
             Name = clone.Name;
         }
 
+        public Leaf(Leaf clone, Vector3 normal) : this(clone)
+        {
+            Rotation = RotateTo(normal);
+        }
+
+        private Vector3 RotateTo(Vector3 target)
+        {
+            float x = (float)(Math.Atan(target.Y / (Math.Sqrt(target.X * target.X + target.Y * target.Y))));
+            float y = (float)(Math.Atan(target.X / target.Z));
+            return new Vector3(x, y, 0);
+        }
+
+
         private Tri[] GenerateRectangle(float x, float y)
         {
             Debug.WriteLine(x.ToString() + " " + y.ToString());
             Tri tri1 = new Tri(
-                    new Vertex(new Vector3(0, 0, 0), new Vector2(0, 0)),
-                    new Vertex(new Vector3(x, 0, 0), new Vector2(1, 0)),
-                    new Vertex(new Vector3(0, 0, y), new Vector2(0, 1))
+                    new Vertex(new Vector3(0, 0, 0), new Vector2(1, 0)),
+                    new Vertex(new Vector3(x, 0, 0), new Vector2(0, 0)),
+                    new Vertex(new Vector3(0, 0, y), new Vector2(1, 1))
                 );
             Tri tri2 = new Tri(
-                    new Vertex(new Vector3(x, 0, y), new Vector2(1, 1)),
-                    new Vertex(new Vector3(x, 0, 0), new Vector2(1, 0)),
-                    new Vertex(new Vector3(0, 0, y), new Vector2(0, 1))
+                    new Vertex(new Vector3(x, 0, y), new Vector2(0, 1)),
+                    new Vertex(new Vector3(x, 0, 0), new Vector2(0, 0)),
+                    new Vertex(new Vector3(0, 0, y), new Vector2(1, 1))
                 );
             return new Tri[]{tri1, tri2};
         }
